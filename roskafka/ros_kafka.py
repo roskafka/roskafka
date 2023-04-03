@@ -14,7 +14,7 @@ class RosKafkaBridge(Node):
             'chatter',
             self.listener_callback,
             10)
-        self.producer = KafkaProducer(bootstrap_servers='localhost:9092')
+        self.producer = KafkaProducer()
 
     def listener_callback(self, msg):
         self.get_logger().info('I heard: "%s"' % msg.data)
