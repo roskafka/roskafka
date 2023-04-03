@@ -11,27 +11,21 @@ class RosKafkaBridge(Node):
         super().__init__('ros_kafka_bridge')
         self.subscription = self.create_subscription(
             String,
-            'chatter',
+            'roskafka',
             self.listener_callback,
             10)
         self.producer = KafkaProducer()
 
-    def listener_callback(self, msg):
-        self.get_logger().info('I heard: "%s"' % msg.data)
-        self.producer.send('ros', msg.data.encode())
+    def listener_callback(self, message):
+        self.get_logger().info(f'Received from ROS: {message.data}')
+        producerRecord = message.data.encode('utf-8')
+        self.producer.send('roskafka.out', producerRecord)
 
 
 def main(args=None):
-
     rclpy.init(args=args)
-
     bridge = RosKafkaBridge()
-
     rclpy.spin(bridge)
-
-    # Destroy the node explicitly
-    # (optional - otherwise it will be done automatically
-    # when the garbage collector destroys the node object)
     bridge.destroy_node()
     rclpy.shutdown()
 
