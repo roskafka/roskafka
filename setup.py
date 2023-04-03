@@ -20,7 +20,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'bridge = roskafka.bridge:main',
+            'ros_kafka = roskafka.ros_kafka:main',
         ],
     },
 )

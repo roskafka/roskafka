@@ -5,10 +5,10 @@ from std_msgs.msg import String
 from kafka import KafkaProducer
 
 
-class Bridge(Node):
+class RosKafkaBridge(Node):
 
     def __init__(self):
-        super().__init__('bridge')
+        super().__init__('ros_kafka_bridge')
         self.subscription = self.create_subscription(
             String,
             'chatter',
@@ -25,7 +25,7 @@ def main(args=None):
 
     rclpy.init(args=args)
 
-    bridge = Bridge()
+    bridge = RosKafkaBridge()
 
     rclpy.spin(bridge)
 

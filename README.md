@@ -8,4 +8,4 @@ Build and run roskafka:
     cd ~/ros2_ws
     PYTHONWARNINGS=ignore:::setuptools.command.install,ignore:::setuptools.command.easy_install,ignore:::pkg_resources colcon build
     . install/setup.bash
-    ros2 run roskafka bridge
+    ros2 run roskafka ros_kafka
