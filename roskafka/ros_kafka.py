@@ -9,6 +9,9 @@ class RosKafkaBridge(Node):
 
     def __init__(self):
         super().__init__('ros_kafka_bridge')
+        self.declare_parameter('ros_input_type', 'std_msgs/msg/String')
+        self.ros_input_type = self.get_parameter('ros_input_type').get_parameter_value().string_value
+        self.get_logger().info(f'Using ROS input type: {self.ros_input_type}')
         self.declare_parameter('ros_input_topic', 'roskafka/in')
         self.ros_input_topic = self.get_parameter('ros_input_topic').get_parameter_value().string_value
         self.get_logger().info(f'Using ROS input topic: {self.ros_input_topic}')
@@ -16,7 +19,7 @@ class RosKafkaBridge(Node):
         self.kafka_output_topic = self.get_parameter('kafka_output_topic').get_parameter_value().string_value
         self.get_logger().info(f'Using Kafka output topic: {self.kafka_output_topic}')
         self.subscription = self.create_subscription(
-            String,
+            self.ros_input_type,
             self.ros_input_topic,
             self.listener_callback,
             10)
