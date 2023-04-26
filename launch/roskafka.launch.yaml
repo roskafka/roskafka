@@ -1,0 +1,11 @@
+launch:
+
+- node:
+    pkg: "roskafka"
+    exec: "ros_kafka"
+    name: "ros_kafka"
+
+- node:
+    pkg: "roskafka"
+    exec: "kafka_ros"
+    name: "kafka_ros"
