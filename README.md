@@ -17,7 +17,7 @@ Source roskafka:
 
 Run roskafka using its launch file:
 
-    ros2 launch roskafka roskafka.launch.yaml
+    ros2 launch roskafka roskafka.launch.yaml ros_input_topic:=roskafka/in ros_output_topic:=roskafka/out kafka_input_topic:=roskafka.in kafka_output_topic:=roskafka.out
 
 Run roskafka manually:
 
