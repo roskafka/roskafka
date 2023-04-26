@@ -9,12 +9,15 @@ class RosKafkaBridge(Node):
 
     def __init__(self):
         super().__init__('ros_kafka_bridge')
+        self.declare_parameter('ros_topic', 'roskafka')
+        self.ros_topic = self.get_parameter('ros_topic').get_parameter_value().string_value
+        self.get_logger().info(f'Using ROS topic: {self.ros_topic}')
         self.declare_parameter('kafka_output_topic', 'roskafka.out')
         self.kafka_output_topic = self.get_parameter('kafka_output_topic').get_parameter_value().string_value
-        self.get_logger().info(f'Using output topic: {self.kafka_output_topic}')
+        self.get_logger().info(f'Using Kafka output topic: {self.kafka_output_topic}')
         self.subscription = self.create_subscription(
             String,
-            'roskafka',
+            self.ros_topic,
             self.listener_callback,
             10)
         self.producer = KafkaProducer()

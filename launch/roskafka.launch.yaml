@@ -1,6 +1,10 @@
 launch:
 
 - arg:
+    name: "ros_topic"
+    default: "roskafka"
+
+- arg:
     name: "kafka_input_topic"
     default: "roskafka.in"
 
@@ -14,6 +18,9 @@ launch:
     name: "ros_kafka"
     param:
     -
+      name: "ros_topic"
+      value: "$(var ros_topic)"
+    -
       name: "kafka_output_topic"
       value: "$(var kafka_output_topic)"
 
@@ -22,6 +29,9 @@ launch:
     exec: "kafka_ros"
     name: "kafka_ros"
     param:
+    -
+      name: "ros_topic"
+      value: "$(var ros_topic)"
     -
       name: "kafka_input_topic"
       value: "$(var kafka_input_topic)"
