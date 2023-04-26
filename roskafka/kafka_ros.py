@@ -9,15 +9,15 @@ class KafkaRosBridge(Node):
 
     def __init__(self):
         super().__init__('kafka_ros_bridge')
-        self.declare_parameter('ros_topic', 'roskafka')
-        self.ros_topic = self.get_parameter('ros_topic').get_parameter_value().string_value
-        self.get_logger().info(f'Using ROS topic: {self.ros_topic}')
+        self.declare_parameter('ros_output_topic', 'roskafka/out')
+        self.ros_output_topic = self.get_parameter('ros_output_topic').get_parameter_value().string_value
+        self.get_logger().info(f'Using ROS output topic: {self.ros_output_topic}')
         self.declare_parameter('kafka_input_topic', 'roskafka.in')
         self.kafka_input_topic = self.get_parameter('kafka_input_topic').get_parameter_value().string_value
         self.get_logger().info(f'Using Kafka input topic: {self.kafka_input_topic}')
         self.publisher = self.create_publisher(
             String,
-            self.ros_topic,
+            self.ros_output_topic,
             10)
         self.consumer = KafkaConsumer(self.kafka_input_topic)
         for consumerRecord in self.consumer:
