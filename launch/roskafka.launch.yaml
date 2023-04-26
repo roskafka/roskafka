@@ -1,11 +1,27 @@
 launch:
 
+- arg:
+    name: "kafka_input_topic"
+    default: "roskafka.in"
+
+- arg:
+    name: "kafka_output_topic"
+    default: "roskafka.out"
+
 - node:
     pkg: "roskafka"
     exec: "ros_kafka"
     name: "ros_kafka"
+    param:
+    -
+      name: "kafka_output_topic"
+      value: "$(var kafka_output_topic)"
 
 - node:
     pkg: "roskafka"
     exec: "kafka_ros"
     name: "kafka_ros"
+    param:
+    -
+      name: "kafka_input_topic"
+      value: "$(var kafka_input_topic)"
