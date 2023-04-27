@@ -3,6 +3,13 @@ import rclpy
 from rclpy.node import Node
 from std_msgs.msg import *
 from kafka import KafkaConsumer
+import os
+import importlib
+
+def getMsgType(type):
+    symbol = os.path.basename(type)
+    module = ".".join(os.path.split(os.path.dirname(type)))
+    return getattr(importlib.import_module(module), symbol)
 
 
 class KafkaRosBridge(Node):
@@ -19,7 +26,7 @@ class KafkaRosBridge(Node):
         self.kafka_input_topic = self.get_parameter('kafka_input_topic').get_parameter_value().string_value
         self.get_logger().info(f'Using Kafka input topic: {self.kafka_input_topic}')
         self.publisher = self.create_publisher(
-            globals(self.ros_output_type),
+            getMsgType(self.ros_output_type),
             self.ros_output_topic,
             10)
         self.consumer = KafkaConsumer(self.kafka_input_topic)

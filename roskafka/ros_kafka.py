@@ -3,6 +3,13 @@ import rclpy
 from rclpy.node import Node
 from std_msgs.msg import *
 from kafka import KafkaProducer
+import os
+import importlib
+
+def getMsgType(type):
+    symbol = os.path.basename(type)
+    module = ".".join(os.path.split(os.path.dirname(type)))
+    return getattr(importlib.import_module(module), symbol)
 
 
 class RosKafkaBridge(Node):
@@ -19,7 +26,7 @@ class RosKafkaBridge(Node):
         self.kafka_output_topic = self.get_parameter('kafka_output_topic').get_parameter_value().string_value
         self.get_logger().info(f'Using Kafka output topic: {self.kafka_output_topic}')
         self.subscription = self.create_subscription(
-            globals(self.ros_input_type),
+            getMsgType(self.ros_input_type),
             self.ros_input_topic,
             self.listener_callback,
             10)
