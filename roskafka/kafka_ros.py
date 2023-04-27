@@ -3,14 +3,7 @@ import rclpy
 from rclpy.node import Node
 from std_msgs.msg import *
 from kafka import KafkaConsumer
-import os
-import importlib
-
-def getMsgType(type):
-    symbol = os.path.basename(type)
-    module = ".".join(os.path.split(os.path.dirname(type)))
-    return getattr(importlib.import_module(module), symbol)
-
+from roskafka.utils import getMsgType
 
 class KafkaRosBridge(Node):
 
