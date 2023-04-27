@@ -1,7 +1,7 @@
 # Each import needs to be declared in package.xml
 import rclpy
 from rclpy.node import Node
-from std_msgs.msg import String
+from std_msgs.msg import *
 from kafka import KafkaConsumer
 
 
@@ -19,7 +19,7 @@ class KafkaRosBridge(Node):
         self.kafka_input_topic = self.get_parameter('kafka_input_topic').get_parameter_value().string_value
         self.get_logger().info(f'Using Kafka input topic: {self.kafka_input_topic}')
         self.publisher = self.create_publisher(
-            self.ros_output_type,
+            globals(self.ros_output_type),
             self.ros_output_topic,
             10)
         self.consumer = KafkaConsumer(self.kafka_input_topic)
