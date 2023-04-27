@@ -24,10 +24,9 @@ class KafkaRosBridge(Node):
             10)
         self.consumer = KafkaConsumer(self.kafka_input_topic)
         for consumerRecord in self.consumer:
-            msg = String()
-            msg.data = consumerRecord.value.decode('utf-8')
-            self.get_logger().info(f'Received from Kafka: {msg.data}')
-            self.publisher.publish(msg)
+            message = consumerRecord.value
+            self.get_logger().info(f'Received from Kafka: {message}')
+            self.publisher.publish(message)
 
 
 def main(args=None):
