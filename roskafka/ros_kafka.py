@@ -27,7 +27,7 @@ class RosKafkaBridge(Node):
 
     def listener_callback(self, message):
         self.get_logger().info(f'Received from ROS: {message}')
-        self.producer.send(self.kafka_output_topic, message)
+        self.producer.send(self.kafka_output_topic, str(message).encode('utf-8'))
 
 
 def main(args=None):
