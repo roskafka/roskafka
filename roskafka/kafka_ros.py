@@ -1,7 +1,7 @@
 import rclpy
 import rclpy.node
 import kafka
-from roskafka.utils import getMsgType
+from roskafka.utils import get_msg_type
 
 class KafkaRosBridge(rclpy.node.Node):
 
@@ -17,7 +17,7 @@ class KafkaRosBridge(rclpy.node.Node):
         self.kafka_input_topic = self.get_parameter('kafka_input_topic').get_parameter_value().string_value
         self.get_logger().info(f'Using Kafka input topic: {self.kafka_input_topic}')
         self.publisher = self.create_publisher(
-            getMsgType(self.ros_output_type),
+            get_msg_type(self.ros_output_type),
             self.ros_output_topic,
             10)
         self.consumer = kafka.KafkaConsumer(self.kafka_input_topic)

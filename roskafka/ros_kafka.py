@@ -1,7 +1,7 @@
 import rclpy
 import rclpy.node
 import kafka
-from roskafka.utils import getMsgType
+from roskafka.utils import get_msg_type
 
 class RosKafkaBridge(rclpy.node.Node):
 
@@ -17,7 +17,7 @@ class RosKafkaBridge(rclpy.node.Node):
         self.kafka_output_topic = self.get_parameter('kafka_output_topic').get_parameter_value().string_value
         self.get_logger().info(f'Using Kafka output topic: {self.kafka_output_topic}')
         self.subscription = self.create_subscription(
-            getMsgType(self.ros_input_type),
+            get_msg_type(self.ros_input_type),
             self.ros_input_topic,
             self.listener_callback,
             10)
