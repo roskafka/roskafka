@@ -1,4 +1,3 @@
-# Each import needs to be declared in package.xml
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import *
