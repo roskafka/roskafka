@@ -1,9 +1,9 @@
 import rclpy
-from rclpy.node import Node
-from kafka import KafkaConsumer
+import rclpy.node
+import kafka
 from roskafka.utils import getMsgType
 
-class KafkaRosBridge(Node):
+class KafkaRosBridge(rclpy.node.Node):
 
     def __init__(self):
         super().__init__('kafka_ros_bridge')
@@ -20,7 +20,7 @@ class KafkaRosBridge(Node):
             getMsgType(self.ros_output_type),
             self.ros_output_topic,
             10)
-        self.consumer = KafkaConsumer(self.kafka_input_topic)
+        self.consumer = kafka.KafkaConsumer(self.kafka_input_topic)
         for consumerRecord in self.consumer:
             message = consumerRecord.value
             self.get_logger().info(f'Received from Kafka: {message}')

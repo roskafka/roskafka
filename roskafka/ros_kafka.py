@@ -1,9 +1,9 @@
 import rclpy
-from rclpy.node import Node
-from kafka import KafkaProducer
+import rclpy.node
+import kafka
 from roskafka.utils import getMsgType
 
-class RosKafkaBridge(Node):
+class RosKafkaBridge(rclpy.node.Node):
 
     def __init__(self):
         super().__init__('ros_kafka_bridge')
@@ -21,7 +21,7 @@ class RosKafkaBridge(Node):
             self.ros_input_topic,
             self.listener_callback,
             10)
-        self.producer = KafkaProducer()
+        self.producer = kafka.KafkaProducer()
 
     def listener_callback(self, message):
         self.get_logger().info(f'Received from ROS: {message}')
