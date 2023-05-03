@@ -1,6 +1,5 @@
 import rclpy
 from rclpy.node import Node
-from std_msgs.msg import *
 from kafka import KafkaConsumer
 from roskafka.utils import getMsgType
 
