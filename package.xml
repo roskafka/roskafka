@@ -7,6 +7,7 @@
   <maintainer email="ros@agrueneberg.info">Alexander Grueneberg</maintainer>
   <license>MIT</license>
   <exec_depend>rclpy</exec_depend>
+  <exec_depend>rosidl_runtime_py</exec_depend>
   <exec_depend>kafka</exec_depend>
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>
