@@ -45,7 +45,6 @@ class KafkaRosBridge(rclpy.node.Node):
 
     def __init__(self):
         super().__init__('kafka_ros', allow_undeclared_parameters=True)
-        self.__consumer = kafka.KafkaConsumer()
         self.__mappings = {}
         self.__subscriptions = {}
         self.__process_mappings()
