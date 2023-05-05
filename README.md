@@ -17,12 +17,12 @@ Source roskafka:
 
 Run roskafka either using its launch file:
 
-    ros2 launch roskafka roskafka.launch.yaml
+    ros2 launch roskafka roskafka.launch.yaml [log_level:=debug]
 
 Or, run roskafka manually:
 
-    ros2 run roskafka kafka_ros &
-    ros2 run roskafka ros_kafka &
+    ros2 run roskafka kafka_ros [--ros-args --log-level kafka_ros:=debug] &
+    ros2 run roskafka ros_kafka [--ros-args --log-level ros_kafka:=debug] &
 
 Prepare mapping file between ROS and Kafka (`ros_kafka.yaml`):
 
