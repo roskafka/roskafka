@@ -41,6 +41,7 @@ class KafkaRosBridge(rclpy.node.Node):
             get_msg_type(mapping['type']),
             mapping['destination'],
             10)
+        self.__publishers[name] = publisher
         thread = ConsumerThread(name, mapping, publisher, self.get_logger())
         self.get_logger().debug(f'Starting consumer thread for mapping {name} ...')
         thread.start()
@@ -49,7 +50,9 @@ class KafkaRosBridge(rclpy.node.Node):
     def remove_mapping(self, name):
         self.get_logger().debug(f'Stopping consumer thread for mapping {name} ...')
         self.__subscriptions[name].stop()
+        self.destroy_publisher(self.__publishers[name])
         del self.__subscriptions[name]
+        del self.__publishers[name]
         del self.__mappings[name]
         # Delete existing parameters by setting them to an empty parameter
         self.set_parameters([
@@ -96,6 +99,7 @@ class KafkaRosBridge(rclpy.node.Node):
     def __init__(self):
         super().__init__('kafka_ros', allow_undeclared_parameters=True)
         self.__mappings = {}
+        self.__publishers = {}
         self.__subscriptions = {}
         self.create_service(AddMapping, 'kafka_ros/add_mapping', self.__add_mapping_service_handler)
         self.create_service(RemoveMapping, 'kafka_ros/remove_mapping', self.__remove_mapping_service_handler)
