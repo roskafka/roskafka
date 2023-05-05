@@ -48,6 +48,8 @@ class KafkaRosBridge(rclpy.node.Node):
         self.__subscriptions[name] = thread
 
     def remove_mapping(self, name):
+        if name not in self.__mappings:
+            raise KeyError()
         self.get_logger().debug(f'Stopping consumer thread for mapping {name} ...')
         self.__subscriptions[name].stop()
         self.destroy_publisher(self.__publishers[name])
@@ -73,7 +75,11 @@ class KafkaRosBridge(rclpy.node.Node):
         old_mappings = previous_mappings.keys() - current_mappings.keys()
         for name in old_mappings:
             self.get_logger().info(f'Old mapping disappeared: {name}')
-            self.remove_mapping(name)
+            try:
+                self.remove_mapping(name)
+            except KeyError:
+                self.get_logger().error("Mapping not found")
+
 
     def __add_mapping_service_handler(self, request, response):
         self.add_mapping(request.name, {
@@ -91,9 +97,14 @@ class KafkaRosBridge(rclpy.node.Node):
         return response
 
     def __remove_mapping_service_handler(self, request, response):
-        self.remove_mapping(request.name)
-        response.success = True
-        response.message = 'Mapping removed'
+        try:
+            self.remove_mapping(request.name)
+        except KeyError:
+            response.success = False
+            response.message = 'Mapping not found'
+        else:
+            response.success = True
+            response.message = 'Mapping removed'
         return response
 
     def __init__(self):

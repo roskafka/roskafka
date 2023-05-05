@@ -23,6 +23,8 @@ class RosKafkaBridge(rclpy.node.Node):
             10)
 
     def remove_mapping(self, name):
+        if name not in self.__mappings:
+            raise KeyError()
         self.destroy_subscription(self.__subscriptions[name])
         del self.__mappings[name]
         # Delete existing parameters by setting them to an empty parameter
@@ -46,6 +48,10 @@ class RosKafkaBridge(rclpy.node.Node):
         for name in old_mappings:
             self.get_logger().info(f'Old mapping disappeared: {name}')
             self.remove_mapping(name)
+            try:
+                self.remove_mapping(name)
+            except KeyError:
+                self.get_logger().error("Mapping not found")
 
     def __add_mapping_service_handler(self, request, response):
         self.add_mapping(request.name, {
@@ -63,9 +69,14 @@ class RosKafkaBridge(rclpy.node.Node):
         return response
 
     def __remove_mapping_service_handler(self, request, response):
-        self.remove_mapping(request.name)
-        response.success = True
-        response.message = 'Mapping removed'
+        try:
+            self.remove_mapping(request.name)
+        except KeyError:
+            response.success = False
+            response.message = 'Mapping not found'
+        else:
+            response.success = True
+            response.message = 'Mapping removed'
         return response
 
     def __init__(self):
