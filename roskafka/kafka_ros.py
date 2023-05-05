@@ -6,6 +6,30 @@ from roskafka.utils import get_msg_type
 from roskafka.utils import params_to_mappings
 from roskafka.utils import json_to_msg
 
+class ConsumerThread:
+
+    def __init__(self, name, mapping, publisher, logger):
+        self.is_running = False
+        def poll():
+            consumer = kafka.KafkaConsumer(mapping['from'])
+            while self.is_running:
+                polling_result = consumer.poll(timeout_ms=1000)
+                for topic_partition, consumer_records in polling_result.items():
+                    for consumer_record in consumer_records:
+                        msg = consumer_record.value
+                        logger.debug(f'Received message from {name}: {msg}')
+                        logger.debug(f'Sending message to {mapping["to"]}: {msg}')
+                        publisher.publish(json_to_msg(mapping['type'], msg))
+        self.thread = threading.Thread(target=poll)
+
+    def start(self):
+        self.is_running = True
+        self.thread.start()
+
+    def stop(self):
+        self.is_running = False
+
+
 class KafkaRosBridge(rclpy.node.Node):
 
     def add_mapping(self, name, mapping):
@@ -13,18 +37,15 @@ class KafkaRosBridge(rclpy.node.Node):
             get_msg_type(mapping['type']),
             mapping['to'],
             10)
-        def poll():
-            consumer = kafka.KafkaConsumer(mapping['from'])
-            for consumerRecord in consumer:
-                msg = consumerRecord.value
-                self.get_logger().debug(f'Received message from {name}: {msg}')
-                self.get_logger().debug(f'Sending message to {mapping["to"]}: {msg}')
-                publisher.publish(json_to_msg(mapping['type'], msg))
-        thread = threading.Thread(target=poll)
+        thread = ConsumerThread(name, mapping, publisher, self.get_logger())
+        self.get_logger().debug(f'Starting consumer thread for mapping {name} ...')
         thread.start()
+        self.__subscriptions[name] = thread
 
     def remove_mapping(self, name):
-        self.__subscriptions[name].destroy()
+        self.get_logger().debug(f'Stopping consumer thread for mapping {name} ...')
+        self.__subscriptions[name].stop()
+        del self.__subscriptions[name]
 
     def __process_mappings(self):
         params = self.get_parameters_by_prefix('mappings')
