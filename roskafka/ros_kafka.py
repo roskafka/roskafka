@@ -1,8 +1,9 @@
 import rclpy
 import kafka
+import json
 from roskafka.bridge_node import BridgeNode
 from roskafka.utils import get_msg_type
-from roskafka.utils import msg_to_json
+from roskafka.utils import msg_to_dict
 
 class RosKafkaBridge(BridgeNode):
 
@@ -13,9 +14,16 @@ class RosKafkaBridge(BridgeNode):
             raise
         def handler(msg):
             self.get_logger().debug(f'Received message from {name}: {msg}')
-            json_str = msg_to_json(msg)
-            self.get_logger().debug(f'Sending message to {mapping["destination"]}: {json_str}')
-            self._producer.send(mapping['destination'], json_str.encode('utf-8'), headers=[
+            producer_record = json.dumps({
+                'payload': msg_to_dict(msg),
+                'metadata': {
+                    'mapping': name,
+                    'source': mapping['source'],
+                    'type': mapping['type']
+                }
+            })
+            self.get_logger().debug(f'Sending message to {mapping["destination"]}: {producer_record}')
+            self._producer.send(mapping['destination'], producer_record.encode('utf-8'), headers=[
                 ('mapping', name.encode('utf-8')),
                 ('source', mapping['source'].encode('utf-8')),
                 ('type', mapping['type'].encode('utf-8'))

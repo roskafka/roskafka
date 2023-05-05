@@ -1,10 +1,11 @@
 import rclpy
 import rclpy.parameter
 import kafka
+import json
 import threading
 from roskafka.bridge_node import BridgeNode
 from roskafka.utils import get_msg_type
-from roskafka.utils import json_to_msg
+from roskafka.utils import dict_to_msg
 
 class ConsumerThread:
 
@@ -16,10 +17,10 @@ class ConsumerThread:
                 polling_result = consumer.poll(timeout_ms=1000)
                 for topic_partition, consumer_records in polling_result.items():
                     for consumer_record in consumer_records:
-                        msg = consumer_record.value
-                        logger.debug(f'Received message from {name}: {msg}')
-                        logger.debug(f'Sending message to {mapping["destination"]}: {msg}')
-                        publisher.publish(json_to_msg(mapping['type'], msg))
+                        logger.debug(f'Received message from {name}: {consumer_record.value}')
+                        msg = json.loads(consumer_record.value)
+                        logger.debug(f'Sending message to {mapping["destination"]}: {msg["payload"]}')
+                        publisher.publish(dict_to_msg(mapping['type'], msg['payload']))
         self.thread = threading.Thread(target=poll)
 
     def start(self):
