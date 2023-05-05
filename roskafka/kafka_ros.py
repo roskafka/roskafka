@@ -36,9 +36,13 @@ class ConsumerThread:
 class KafkaRosBridge(rclpy.node.Node):
 
     def add_mapping(self, name, mapping):
+        try:
+            msg_type = get_msg_type(mapping['type'])
+        except Exception:
+            raise
         self.__mappings[name] = mapping
         publisher = self.create_publisher(
-            get_msg_type(mapping['type']),
+            msg_type,
             mapping['destination'],
             10)
         self.__publishers[name] = publisher
@@ -70,7 +74,10 @@ class KafkaRosBridge(rclpy.node.Node):
         new_mappings = current_mappings.keys() - previous_mappings.keys()
         for name in new_mappings:
             self.get_logger().info(f'Found new mapping: {name}')
-            self.add_mapping(name, current_mappings[name])
+            try:
+                self.add_mapping(name, current_mappings[name])
+            except Exception as e:
+                self.get_logger().error(f'Could not add mapping: {e}')
         # Unsubscribe from old mappings
         old_mappings = previous_mappings.keys() - current_mappings.keys()
         for name in old_mappings:
@@ -82,18 +89,23 @@ class KafkaRosBridge(rclpy.node.Node):
 
 
     def __add_mapping_service_handler(self, request, response):
-        self.add_mapping(request.name, {
-            'source': request.source,
-            'destination': request.destination,
-            'type': request.type
-        })
-        self.set_parameters([
-            rclpy.parameter.Parameter(f'mappings.{request.name}.source', value=request.source),
-            rclpy.parameter.Parameter(f'mappings.{request.name}.destination', value=request.destination),
-            rclpy.parameter.Parameter(f'mappings.{request.name}.type', value=request.type)
-        ])
-        response.success = True
-        response.message = 'Mapping added'
+        try:
+            self.add_mapping(request.name, {
+                'source': request.source,
+                'destination': request.destination,
+                'type': request.type
+            })
+        except Exception as e:
+            response.success = False
+            response.message = f'Could not add mapping: {e}'
+        else:
+            self.set_parameters([
+                rclpy.parameter.Parameter(f'mappings.{request.name}.source', value=request.source),
+                rclpy.parameter.Parameter(f'mappings.{request.name}.destination', value=request.destination),
+                rclpy.parameter.Parameter(f'mappings.{request.name}.type', value=request.type)
+            ])
+            response.success = True
+            response.message = 'Mapping added'
         return response
 
     def __remove_mapping_service_handler(self, request, response):
