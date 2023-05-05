@@ -15,7 +15,6 @@ class KafkaRosBridge(rclpy.node.Node):
             10)
         def poll():
             consumer = kafka.KafkaConsumer(mapping['from'])
-            consumer.poll(timeout_ms=1000)
             for consumerRecord in consumer:
                 msg = consumerRecord.value
                 self.get_logger().info(f'Received message from {name}: {msg}')
