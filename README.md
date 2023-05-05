@@ -9,7 +9,7 @@ Initial setup:
 Build roskafka:
 
     cd ~/ros2_ws
-    PYTHONWARNINGS=ignore:::setuptools.command.install colcon build
+    PYTHONWARNINGS=ignore:::setuptools.command.install colcon build --packages-select roskafka
 
 Source roskafka:
 
