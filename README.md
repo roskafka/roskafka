@@ -24,7 +24,7 @@ Or, run roskafka manually:
     ros2 run roskafka kafka_ros [--ros-args --log-level kafka_ros:=debug] &
     ros2 run roskafka ros_kafka [--ros-args --log-level ros_kafka:=debug] &
 
-Prepare mapping file between ROS and Kafka (`ros_kafka.yaml`):
+Prepare mapping file (`mapping.yaml`):
 
     /ros_kafka:
       ros__parameters:
@@ -34,9 +34,6 @@ Prepare mapping file between ROS and Kafka (`ros_kafka.yaml`):
             to: "turtle1_pose"
             type: "turtlesim/msg/Pose"
         use_sim_time: false
-
-Prepare mapping file between Kafka and ROS (`kafka_ros.yaml`):
-
     /kafka_ros:
       ros__parameters:
         mappings:
@@ -48,8 +45,8 @@ Prepare mapping file between Kafka and ROS (`kafka_ros.yaml`):
 
 Provide mappings to bridge nodes:
 
-    ros2 param load /ros_kafka ros_kafka.yaml
-    ros2 param load /kafka_ros kafka_ros.yaml
+    ros2 param load /ros_kafka mapping.yaml
+    ros2 param load /kafka_ros mapping.yaml
 
 Run turtlesim and let turtle move in a circle:
 
