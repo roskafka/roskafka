@@ -17,7 +17,8 @@ class KafkaRosBridge(rclpy.node.Node):
             consumer = kafka.KafkaConsumer(mapping['from'])
             for consumerRecord in consumer:
                 msg = consumerRecord.value
-                self.get_logger().info(f'Received message from {name}: {msg}')
+                self.get_logger().debug(f'Received message from {name}: {msg}')
+                self.get_logger().debug(f'Sending message to {mapping["to"]}: {msg}')
                 publisher.publish(json_to_msg(mapping['type'], msg))
         thread = threading.Thread(target=poll)
         thread.start()

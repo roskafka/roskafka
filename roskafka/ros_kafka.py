@@ -9,9 +9,9 @@ class RosKafkaBridge(rclpy.node.Node):
 
     def add_mapping(self, name, mapping):
         def handler(msg):
-            self.get_logger().info(f'Received message from {name}: {msg}')
+            self.get_logger().debug(f'Received message from {name}: {msg}')
             json_str = msg_to_json(msg)
-            self.get_logger().info(f'Sending message to {mapping["to"]}: {json_str}')
+            self.get_logger().debug(f'Sending message to {mapping["to"]}: {json_str}')
             self.__producer.send(mapping['to'], json_str.encode('utf-8'))
         self.__subscriptions[name] = self.create_subscription(
             get_msg_type(mapping['type']),
