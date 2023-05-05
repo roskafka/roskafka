@@ -15,7 +15,11 @@ class RosKafkaBridge(BridgeNode):
             self.get_logger().debug(f'Received message from {name}: {msg}')
             json_str = msg_to_json(msg)
             self.get_logger().debug(f'Sending message to {mapping["destination"]}: {json_str}')
-            self._producer.send(mapping['destination'], json_str.encode('utf-8'))
+            self._producer.send(mapping['destination'], json_str.encode('utf-8'), headers=[
+                ('mapping', name.encode('utf-8')),
+                ('source', mapping['source'].encode('utf-8')),
+                ('type', mapping['type'].encode('utf-8'))
+            ])
         mapping['subscriber'] = self.create_subscription(
             msg_type,
             mapping['source'],
