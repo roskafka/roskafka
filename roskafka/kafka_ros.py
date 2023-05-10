@@ -7,10 +7,12 @@ from roskafka.bridge_node import BridgeNode
 from roskafka.utils import get_msg_type
 from roskafka.utils import dict_to_msg
 
+
 class ConsumerThread:
 
     def __init__(self, name, mapping, publisher, logger):
         self.is_running = False
+
         def poll():
             consumer = kafka.KafkaConsumer(mapping['source'])
             while self.is_running:

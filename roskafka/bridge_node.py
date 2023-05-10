@@ -4,6 +4,7 @@ from roskafka.utils import params_to_mappings
 from roskafka_interfaces.srv import AddMapping
 from roskafka_interfaces.srv import RemoveMapping
 
+
 class BridgeNode(rclpy.node.Node):
 
     def _process_params(self):
@@ -27,7 +28,6 @@ class BridgeNode(rclpy.node.Node):
                 self.remove_mapping(name)
             except KeyError:
                 self.get_logger().error("Mapping not found")
-
 
     def _add_mapping_service_handler(self, request, response):
         try:

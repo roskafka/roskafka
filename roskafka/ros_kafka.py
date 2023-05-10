@@ -5,6 +5,7 @@ from roskafka.bridge_node import BridgeNode
 from roskafka.utils import get_msg_type
 from roskafka.utils import msg_to_dict
 
+
 class RosKafkaBridge(BridgeNode):
 
     def add_mapping(self, name, mapping):
@@ -12,6 +13,7 @@ class RosKafkaBridge(BridgeNode):
             msg_type = get_msg_type(mapping['type'])
         except Exception:
             raise
+
         def handler(msg):
             self.get_logger().debug(f'Received message from {name}: {msg}')
             producer_record = json.dumps({
