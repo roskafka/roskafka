@@ -88,3 +88,8 @@ Pump messages from `turtle1_pose` (Kafka) to `/turtle1/pose_from_kafka` (ROS):
 Verify that messages are arriving in ROS:
 
     ros2 topic echo /turtle1/pose_from_kafka
+
+## Testing
+
+    colcon test --packages-select roskafka
+    colcon test-result --all --verbose
