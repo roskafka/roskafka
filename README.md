@@ -72,6 +72,23 @@ The `destination` parameter in the `kafka_ros` mappings can be specified as a
 template, e.g., `/${mapping}/pose_from_kafka`. The values for the variables are
 substituted from the `metadata` part of the message.
 
+## Message Format
+
+The messages sent to Kafka via `ros_kafka` have the following structure:
+
+    {
+        "payload": <msg>,
+        "metadata": <metadata>
+    }
+
+`<msg>` is the serialized ROS 2 message, `<metadata>` an object containing the
+name of the mapping (`mapping`), the mapping source (`source`), and the mapping
+destination (`destination`). This information is also put into the Kafka header
+of the message.
+
+The messages that are received by `kafka_ros` expect the same structure. The
+`metadata` object can be used for template substitutions (see above).
+
 ## Demo
 
 Run turtlesim and let turtle move in a circle:
