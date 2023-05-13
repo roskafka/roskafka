@@ -3,6 +3,7 @@ import rclpy.parameter
 import kafka
 import json
 import threading
+import string
 from roskafka.bridge_node import BridgeNode
 from roskafka.utils import get_msg_type
 from roskafka.utils import dict_to_msg
@@ -14,6 +15,10 @@ class ConsumerThread:
         self.is_running = False
 
         def poll():
+            try:
+                msg_type = get_msg_type(mapping['type'])
+            except Exception:
+                raise
             consumer = kafka.KafkaConsumer(mapping['source'])
             while self.is_running:
                 polling_result = consumer.poll(timeout_ms=1000)
@@ -21,8 +26,15 @@ class ConsumerThread:
                     for consumer_record in consumer_records:
                         node.get_logger().debug(f'Received message from {name}: {consumer_record.value}')
                         msg = json.loads(consumer_record.value)
-                        node.get_logger().debug(f'Sending message to {mapping["destination"]}: {msg["payload"]}')
-                        mapping['publisher'].publish(dict_to_msg(mapping['type'], msg['payload']))
+                        destination = string.Template(mapping['destination']).substitute(msg['metadata'])
+                        if destination not in mapping['publishers']:
+                            mapping['publishers'][destination] = node.create_publisher(
+                                msg_type,
+                                destination,
+                                10)
+                            node.get_logger().info(f'Created publisher for destination {destination}')
+                        node.get_logger().debug(f'Sending message to {destination}: {msg["payload"]}')
+                        mapping['publishers'][destination].publish(dict_to_msg(mapping['type'], msg['payload']))
         self.thread = threading.Thread(target=poll)
 
     def start(self):
@@ -36,14 +48,7 @@ class ConsumerThread:
 class KafkaRosBridge(BridgeNode):
 
     def add_mapping(self, name, mapping):
-        try:
-            msg_type = get_msg_type(mapping['type'])
-        except Exception:
-            raise
-        mapping['publisher'] = self.create_publisher(
-            msg_type,
-            mapping['destination'],
-            10)
+        mapping['publishers'] = {}
         mapping['subscriber'] = ConsumerThread(self, name, mapping)
         self.get_logger().debug(f'Starting consumer thread for mapping {name} ...')
         mapping['subscriber'].start()
@@ -54,7 +59,8 @@ class KafkaRosBridge(BridgeNode):
             raise KeyError()
         self.get_logger().debug(f'Stopping consumer thread for mapping {name} ...')
         self._mappings[name]['subscriber'].stop()
-        self.destroy_publisher(self._mappings[name]['publisher'])
+        for _, publisher in self._mappings[name]['publishers'].items():
+            self.destroy_publisher(publisher)
         # Delete existing parameters by setting them to an empty parameter
         self.set_parameters([
             rclpy.parameter.Parameter(f'mappings.{name}.{paramName}') for paramName in self.get_parameters_by_prefix(f'mappings.{name}')

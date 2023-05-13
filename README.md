@@ -66,6 +66,12 @@ Provide mappings to bridge nodes:
     ros2 service call /ros_kafka/add_mapping roskafka_interfaces/srv/AddMapping '{name: <mapping_name>, source: <ros_topic>, destination: <kafka_topic>, type: <msg_type>}'
     ros2 service call /kafka_ros/add_mapping roskafka_interfaces/srv/AddMapping '{name: <mapping_name>, source: <kafka_topic>, destination: <ros_topic>, type: <msg_type>}'
 
+### Templates
+
+The `destination` parameter in the `kafka_ros` mappings can be specified as a
+template, e.g., `/${mapping}/pose_from_kafka`. The values for the variables are
+substituted from the `metadata` part of the message.
+
 ## Demo
 
 Run turtlesim and let turtle move in a circle:
