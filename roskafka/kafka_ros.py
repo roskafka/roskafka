@@ -10,7 +10,7 @@ from roskafka.utils import dict_to_msg
 
 class ConsumerThread:
 
-    def __init__(self, name, mapping, logger):
+    def __init__(self, node, name, mapping):
         self.is_running = False
 
         def poll():
@@ -19,9 +19,9 @@ class ConsumerThread:
                 polling_result = consumer.poll(timeout_ms=1000)
                 for topic_partition, consumer_records in polling_result.items():
                     for consumer_record in consumer_records:
-                        logger.debug(f'Received message from {name}: {consumer_record.value}')
+                        node.get_logger().debug(f'Received message from {name}: {consumer_record.value}')
                         msg = json.loads(consumer_record.value)
-                        logger.debug(f'Sending message to {mapping["destination"]}: {msg["payload"]}')
+                        node.get_logger().debug(f'Sending message to {mapping["destination"]}: {msg["payload"]}')
                         mapping['publisher'].publish(dict_to_msg(mapping['type'], msg['payload']))
         self.thread = threading.Thread(target=poll)
 
@@ -44,7 +44,7 @@ class KafkaRosBridge(BridgeNode):
             msg_type,
             mapping['destination'],
             10)
-        mapping['subscriber'] = ConsumerThread(name, mapping, self.get_logger())
+        mapping['subscriber'] = ConsumerThread(self, name, mapping)
         self.get_logger().debug(f'Starting consumer thread for mapping {name} ...')
         mapping['subscriber'].start()
         self._mappings[name] = mapping
