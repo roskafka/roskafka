@@ -40,7 +40,7 @@ class BridgeNode(rclpy.node.Node):
             response.success = False
             response.message = f'Could not add mapping: {e}'
         else:
-            self.set_parameters([
+            self.set_parameters_atomically([
                 rclpy.parameter.Parameter(f'mappings.{request.name}.source', value=request.source),
                 rclpy.parameter.Parameter(f'mappings.{request.name}.destination', value=request.destination),
                 rclpy.parameter.Parameter(f'mappings.{request.name}.type', value=request.type)

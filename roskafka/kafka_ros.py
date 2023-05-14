@@ -62,7 +62,7 @@ class KafkaRosBridge(BridgeNode):
         for _, publisher in self._mappings[name]['publishers'].items():
             self.destroy_publisher(publisher)
         # Delete existing parameters by setting them to an empty parameter
-        self.set_parameters([
+        self.set_parameters_atomically([
             rclpy.parameter.Parameter(f'mappings.{name}.{paramName}') for paramName in self.get_parameters_by_prefix(f'mappings.{name}')
         ])
         del self._mappings[name]
