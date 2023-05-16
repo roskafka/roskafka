@@ -17,7 +17,7 @@ class BridgeNode(rclpy.node.Node):
         for name in new_mappings:
             self.get_logger().info(f'Found new mapping: {name}')
             try:
-                self.add_mapping(name, current_mappings[name])
+                self.add_mapping(name, current_mappings[name]['source'], current_mappings[name]['destination'], current_mappings[name]['type'])
             except Exception as e:
                 self.get_logger().error(f'Could not add mapping: {e}')
         # Unsubscribe from old mappings
@@ -31,11 +31,7 @@ class BridgeNode(rclpy.node.Node):
 
     def _add_mapping_service_handler(self, request, response):
         try:
-            self.add_mapping(request.name, {
-                'source': request.source,
-                'destination': request.destination,
-                'type': request.type
-            })
+            self.add_mapping(request.name, request.source, request.destination, request.type)
         except Exception as e:
             response.success = False
             response.message = f'Could not add mapping: {e}'

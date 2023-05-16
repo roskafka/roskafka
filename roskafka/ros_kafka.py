@@ -1,46 +1,68 @@
 import rclpy
 import kafka
 import json
+from roskafka.mapping import Mapping
 from roskafka.bridge_node import BridgeNode
 from roskafka.utils import get_msg_type
 from roskafka.utils import msg_to_dict
 
 
-class RosKafkaBridge(BridgeNode):
+class RosKafkaMapping(Mapping):
 
-    def add_mapping(self, name, mapping):
+    def close(self):
+        self.node.get_logger().debug(f'Destroying subscription for mapping {self.name} ...')
+        self.node.destroy_subscription(self.subscriber)
+        self._closed = True
+
+    def _msg_handler(self, msg):
+        self.node.get_logger().debug(f'Received message from {self.name}: {msg}')
+        producer_record = json.dumps({
+            'payload': msg_to_dict(msg),
+            'metadata': {
+                'mapping': self.name,
+                'source': self.source,
+                'type': self.type
+            }
+        })
+        self.node.get_logger().debug(f'Sending message to {self.destination}: {producer_record}')
+        self.producer.send(self.destination, producer_record.encode('utf-8'), headers=[
+            ('mapping', self.name.encode('utf-8')),
+            ('source', self.source.encode('utf-8')),
+            ('type', self.type.encode('utf-8'))
+        ])
+
+    def __init__(self, node, name, source, destination, type):
+        super().__init__(node, name, source, destination, type)
+        self._closed = False
         try:
-            msg_type = get_msg_type(mapping['type'])
+            msg_type = get_msg_type(self.type)
         except Exception:
             raise
+        node.get_logger().debug(f'Creating KafkaProducer to {self.destination} for {self.name} ...')
+        self.producer = kafka.KafkaProducer()
 
-        def handler(msg):
-            self.get_logger().debug(f'Received message from {name}: {msg}')
-            producer_record = json.dumps({
-                'payload': msg_to_dict(msg),
-                'metadata': {
-                    'mapping': name,
-                    'source': mapping['source'],
-                    'type': mapping['type']
-                }
-            })
-            self.get_logger().debug(f'Sending message to {mapping["destination"]}: {producer_record}')
-            self._producer.send(mapping['destination'], producer_record.encode('utf-8'), headers=[
-                ('mapping', name.encode('utf-8')),
-                ('source', mapping['source'].encode('utf-8')),
-                ('type', mapping['type'].encode('utf-8'))
-            ])
-        mapping['subscriber'] = self.create_subscription(
+        node.get_logger().debug(f'Creating ROS subscription to {self.source} for {self.name} ...')
+        self.subscriber = self.node.create_subscription(
             msg_type,
-            mapping['source'],
-            handler,
+            self.source,
+            self._msg_handler,
             10)
+
+    def __del__(self):
+        if not self._closed:
+            self.close()
+
+
+class RosKafkaBridge(BridgeNode):
+
+    def add_mapping(self, name, source, destination, type):
+        mapping = RosKafkaMapping(self, name, source, destination, type)
         self._mappings[name] = mapping
 
     def remove_mapping(self, name):
         if name not in self._mappings:
             raise KeyError()
-        self.destroy_subscription(self._mappings[name]['subscriber'])
+        self._mappings[name].close()
         # Delete existing parameters by setting them to an empty parameter
         self.set_parameters_atomically([
             rclpy.parameter.Parameter(f'mappings.{name}.{paramName}') for paramName in self.get_parameters_by_prefix(f'mappings.{name}')
@@ -49,7 +71,6 @@ class RosKafkaBridge(BridgeNode):
 
     def __init__(self):
         super().__init__('ros_kafka')
-        self._producer = kafka.KafkaProducer()
 
 
 def main(args=None):
