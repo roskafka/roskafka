@@ -65,10 +65,15 @@ Prepare mapping file (`mapping.yaml`):
             type: <msg_type>
         use_sim_time: false
 
-Provide mappings to bridge nodes:
+Provide mappings after starting the bridge nodes:
 
     ros2 param load /ros_kafka mapping.yaml
     ros2 param load /kafka_ros mapping.yaml
+
+Alternatively, the mappings can be provided when starting the bridge nodes:
+
+    ros2 run roskafka kafka_ros --ros-args --params-file mapping.yaml &
+    ros2 run roskafka ros_kafka --ros-args --params-file mapping.yaml &
 
 ### Using services
 
