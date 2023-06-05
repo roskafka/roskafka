@@ -46,7 +46,7 @@ services.
 
 ### Using parameter files
 
-Prepare mapping file (`mapping.yaml`):
+Prepare mapping file (`mappings.yaml`):
 
     /ros_kafka:
       ros__parameters:
@@ -67,13 +67,13 @@ Prepare mapping file (`mapping.yaml`):
 
 Provide mappings after starting the bridge nodes:
 
-    ros2 param load /ros_kafka mapping.yaml
-    ros2 param load /kafka_ros mapping.yaml
+    ros2 param load /ros_kafka mappings.yaml
+    ros2 param load /kafka_ros mappings.yaml
 
 Alternatively, the mappings can be provided when starting the bridge nodes:
 
-    ros2 run roskafka kafka_ros --ros-args --params-file mapping.yaml &
-    ros2 run roskafka ros_kafka --ros-args --params-file mapping.yaml &
+    ros2 run roskafka kafka_ros --ros-args --params-file mappings.yaml &
+    ros2 run roskafka ros_kafka --ros-args --params-file mappings.yaml &
 
 ### Using services
 
