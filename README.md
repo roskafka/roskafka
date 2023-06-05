@@ -23,12 +23,21 @@ There are two ways to start roskafka: using launch files or manually.
 
 ### Using launch file
 
-    ros2 launch roskafka roskafka.launch.yaml [log_level:=debug]
+    ros2 launch roskafka roskafka.launch.yaml
+
+Optionally, the log level can be configured using the `log_level` parameter:
+
+    ros2 launch roskafka roskafka.launch.yaml log_level:=debug
 
 ### Manually
 
-    ros2 run roskafka kafka_ros [--ros-args --log-level kafka_ros:=debug] &
-    ros2 run roskafka ros_kafka [--ros-args --log-level ros_kafka:=debug] &
+    ros2 run roskafka kafka_ros &
+    ros2 run roskafka ros_kafka &
+
+Optionally, the log level can be configured using the `log_level` parameter:
+
+    ros2 run roskafka kafka_ros --ros-args --log-level kafka_ros:=debug &
+    ros2 run roskafka ros_kafka --ros-args --log-level ros_kafka:=debug &
 
 ## Configuration
 
