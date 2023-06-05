@@ -8,6 +8,9 @@ Initial setup:
     cd ~/ros2_ws/src
     git clone https://gitlab.informatik.hs-furtwangen.de/ss23-forschungsprojekt-7/roskafka.git
 
+Install dependencies:
+- [roskafka_interfaces](https://gitlab.informatik.hs-furtwangen.de/ss23-forschungsprojekt-7/roskafka_interfaces)
+
 Build package:
 
     cd ~/ros2_ws
