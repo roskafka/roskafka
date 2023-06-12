@@ -1,9 +1,9 @@
 import rclpy
 import rclpy.parameter
-import kafka
 import json
 import threading
 import string
+
 from roskafka.mapping import Mapping
 from roskafka.bridge_node import BridgeNode
 from roskafka.utils import get_msg_type
