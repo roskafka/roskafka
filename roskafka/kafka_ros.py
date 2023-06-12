@@ -18,7 +18,7 @@ class ConsumerThread:
             self.msg_type = get_msg_type(mapping.type)
         except Exception:
             raise
-        self.consumer = kafka.KafkaConsumer(mapping.source)
+        self.consumer = kafka.KafkaConsumer(mapping.source, bootstrap_servers="localhost:9092")
 
         def poll():
             while self.is_running:

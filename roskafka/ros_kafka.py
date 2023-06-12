@@ -39,7 +39,7 @@ class RosKafkaMapping(Mapping):
         except Exception:
             raise
         node.get_logger().debug(f'Creating KafkaProducer to {self.destination} for {self.name} ...')
-        self.producer = kafka.KafkaProducer()
+        self.producer = kafka.KafkaProducer(bootstrap_servers="localhost:9092")
 
         node.get_logger().debug(f'Creating ROS subscription to {self.source} for {self.name} ...')
         self.subscriber = self.node.create_subscription(
