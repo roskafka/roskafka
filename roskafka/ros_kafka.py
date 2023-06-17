@@ -12,11 +12,7 @@ from roskafka.mapping import Mapping
 from roskafka.bridge_node import BridgeNode
 from roskafka.utils import get_msg_type
 from roskafka.utils import msg_to_dict
-
-schema_registry = os.environ.get("SCHEMA_REGISTRY", "http://localhost:8081")
-bootstrap_servers = os.environ.get("BOOTSTRAP_SERVERS", "localhost:9092")
-
-sr = SchemaRegistryClient({"url": schema_registry})
+from roskafka.kafka_config import bootstrap_servers, wait_for_schema, sr
 
 
 class RosKafkaMapping(Mapping):
@@ -56,7 +52,7 @@ class RosKafkaMapping(Mapping):
         except Exception:
             raise
         node.get_logger().debug(f'Creating KafkaProducer to {self.destination} for {self.name} ...')
-        schema_value = sr.get_latest_version(f"{self.destination}-value").schema
+        schema_value = wait_for_schema(self.node, self.destination)
         self.value_serializer = AvroSerializer(schema_registry_client=sr, schema_str=schema_value)
         self.key_serializer = StringSerializer('utf_8')
         self.producer = Producer({
