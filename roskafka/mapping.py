@@ -3,6 +3,7 @@ import json
 
 import rclpy
 import confluent_kafka
+import confluent_kafka.admin
 
 from roskafka.kafka_config import bootstrap_servers, schema_registry
 from roskafka.utils import get_msg_type
