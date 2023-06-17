@@ -1,4 +1,3 @@
-import utils
 import requests
 import json
 
@@ -8,10 +7,11 @@ import confluent_kafka
 from roskafka.mapping import Mapping
 from roskafka.bridge_node import BridgeNode
 from roskafka.kafka_config import bootstrap_servers, schema_registry
+from roskafka.utils import get_msg_type
 
 
 def get_recursive_fields(msg_type_name: str):
-    msg_type = utils.get_msg_type(msg_type_name)
+    msg_type = get_msg_type(msg_type_name)
     ros_fields = msg_type.get_fields_and_field_types()
     print(f"{msg_type_name}: {ros_fields}")
     fields = []
