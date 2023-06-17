@@ -3,6 +3,10 @@ import json
 
 import confluent_kafka
 import confluent_kafka.admin
+from confluent_kafka import KafkaError
+
+# KafkaError
+
 
 from roskafka.kafka_config import bootstrap_servers, schema_registry
 from roskafka.utils import get_msg_type
@@ -60,8 +64,11 @@ def create_kafka_topic(name: str, logger):
             future.result()
             logger.info(f"Successfully created kafka topic: {name}")
         except Exception as e:
-            logger.error(f"Failed to create kafka topic: {name} err=\"{e}\"")
-            raise e
+            if isinstance(e, KafkaError) and e.code() == KafkaError.TOPIC_ALREADY_EXISTS:
+                logger.debug(f"Topic already exists: {name}")
+            else:
+                logger.error(f"Failed to create kafka topic: {name} err=\"{e}\"")
+                raise
 
 
 def create_avro_schema(mapping: Mapping, logger):
