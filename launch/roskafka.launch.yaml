@@ -15,3 +15,9 @@ launch:
     exec: kafka_ros
     name: kafka_ros
     ros_args: --log-level kafka_ros:=$(var log_level)
+
+- node:
+    pkg: roskafka
+    exec: ros_kafka_setup
+    name: ros_kafka_setup
+    ros_args: --log-level kafka_ros:=$(var log_level)
