@@ -16,7 +16,7 @@ class Mapping:
         self.source = source
         self.destination = destination
         self.type = type
-        add_mapping(self.node, self.name, self.source, self.destination, self.type)
+        add_mapping(self)
 
 
 def get_recursive_fields(msg_type_name: str, logger):
@@ -74,11 +74,10 @@ def create_avro_schema(mapping: Mapping, logger):
         logger.info(f"Successfully pushed avro schema to registry: {res.text} schema_name=\"{mapping.destination}-value\"")
 
 
-def add_mapping(node, name, source, destination, mapping_type):
-    mapping = Mapping(node, name, source, destination, mapping_type)
-    print(f"Adding mapping: {mapping}")
-    create_kafka_topic(mapping.destination, node.get_logger())
-    create_avro_schema(mapping, node.get_logger())
+def add_mapping(mapping: Mapping):
+    mapping.node.get_logger().info(f"Adding mapping: {mapping}")
+    create_kafka_topic(mapping.destination, mapping.node.get_logger())
+    create_avro_schema(mapping, mapping.node.get_logger())
 
 
 if __name__ == "__main__":
