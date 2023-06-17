@@ -63,12 +63,14 @@ def create_kafka_topic(name: str, logger):
         try:
             future.result()
             logger.info(f"Successfully created kafka topic: {name}")
-        except Exception as e:
-            if isinstance(e, KafkaError) and e.code() == KafkaError.TOPIC_ALREADY_EXISTS:
+        except KafkaError as e:
+            if e.code() == KafkaError.TOPIC_ALREADY_EXISTS:
                 logger.debug(f"Topic already exists: {name}")
             else:
-                logger.error(f"Failed to create kafka topic: {name} err=\"{e}\"")
                 raise
+        except Exception as e:
+            logger.error(f"Failed to create kafka topic: {name} err=\"{e}\" {type(e)}")
+            raise
 
 
 def create_avro_schema(mapping: Mapping, logger):
