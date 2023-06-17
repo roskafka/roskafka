@@ -58,10 +58,10 @@ def create_kafka_topic(name: str, logger):
     for topic, future in future_topics.items():
         try:
             future.result()
+            logger.info(f"Successfully created kafka topic: {name}")
         except Exception as e:
             logger.error(f"Failed to create kafka topic: {name} err=\"{e}\"")
             raise e
-    logger.info(f"Successfully created kafka topic: {name}")
 
 
 def create_avro_schema(mapping: Mapping, logger):
