@@ -3,7 +3,7 @@ import json
 
 import confluent_kafka
 import confluent_kafka.admin
-from confluent_kafka import KafkaError
+from confluent_kafka import KafkaError, KafkaException
 
 # KafkaError
 
@@ -63,13 +63,14 @@ def create_kafka_topic(name: str, logger):
         try:
             future.result()
             logger.info(f"Successfully created kafka topic: {name}")
-        except KafkaError as e:
-            if e.code() == KafkaError.TOPIC_ALREADY_EXISTS:
+        except KafkaException as e:
+            err = e.args[0]
+            if err.code() == KafkaError.TOPIC_ALREADY_EXISTS:
                 logger.debug(f"Topic already exists: {name}")
             else:
                 raise
         except Exception as e:
-            logger.error(f"Failed to create kafka topic: {name} err=\"{e}\" {type(e)}")
+            logger.error(f"Failed to create kafka topic: {name} err=\"{e}\"")
             raise
 
 
