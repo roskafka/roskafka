@@ -25,7 +25,6 @@ setup(
         'console_scripts': [
             'ros_kafka = roskafka.ros_kafka:main',
             'kafka_ros = roskafka.kafka_ros:main',
-            'ros_kafka_setup = roskafka.ros_kafka_setup:main'
         ],
     },
 )

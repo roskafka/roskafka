@@ -65,43 +65,13 @@ def create_avro_schema(mapping: Mapping):
         print(f"Successfully pushed avro schema to registry: {res.text} schema_name=\"{mapping.destination}-value\"")
 
 
-class RosKafkaSetup(BridgeNode):
-
-    def add_mapping(self, name, source, destination, type):
-        mapping = Mapping(self, name, source, destination, type)
-        print(f"Adding mapping: {mapping}")
-        create_kafka_topic(mapping.destination)
-        create_avro_schema(mapping)
-        self._mappings[name] = mapping
-
-    def remove_mapping(self, name):
-        if name not in self._mappings:
-            raise KeyError()
-        self._mappings[name].close()
-        # Delete existing parameters by setting them to an empty parameter
-        self.set_parameters_atomically([
-            rclpy.parameter.Parameter(f'mappings.{name}.{paramName}') for paramName in
-            self.get_parameters_by_prefix(f'mappings.{name}')
-        ])
-        del self._mappings[name]
-        # TODO: delete topic and schema from registry?
-
-    def __init__(self):
-        super().__init__('ros_kafka_setup')
-        self.get_logger().info("Starting ros_kafka_setup node...")
+def add_mapping(node, name, source, destination, mapping_type):
+    mapping = Mapping(node, name, source, destination, mapping_type)
+    print(f"Adding mapping: {mapping}")
+    create_kafka_topic(mapping.destination)
+    create_avro_schema(mapping)
 
 
-def main(args=None):
-    rclpy.init(args=args)
-    bridge = RosKafkaSetup()
-    rclpy.spin(bridge)
-    bridge.destroy_node()
-    rclpy.shutdown()
-
-
-if __name__ == '__main__':
-    main()
-
-# if __name__ == "__main__":
-#     schema = generate_avro(Mapping("node1", "node1", "/robot1/positions", "positions", "std_msgs/msg/String"))
-#     print(schema)
+if __name__ == "__main__":
+    schema = generate_avro(Mapping("node1", "node1", "/robot1/positions", "positions", "std_msgs/msg/String"))
+    print(schema)
