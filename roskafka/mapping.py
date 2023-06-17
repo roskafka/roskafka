@@ -1,7 +1,6 @@
 import requests
 import json
 
-import rclpy
 import confluent_kafka
 import confluent_kafka.admin
 
@@ -55,7 +54,13 @@ def avro_record(name: str, fields: list):
 def create_kafka_topic(name: str, logger):
     admin_client = confluent_kafka.admin.AdminClient({"bootstrap.servers": bootstrap_servers})
     new_topic = confluent_kafka.admin.NewTopic(name, num_partitions=1, replication_factor=1)
-    admin_client.create_topics([new_topic])
+    future_topics = admin_client.create_topics([new_topic])
+    for topic, future in future_topics.items():
+        try:
+            future.result()
+        except Exception as e:
+            logger.error(f"Failed to create kafka topic: {name} err=\"{e}\"")
+            raise e
     logger.info(f"Successfully created kafka topic: {name}")
 
 
@@ -84,3 +89,11 @@ def add_mapping(mapping: Mapping):
 if __name__ == "__main__":
     s = generate_avro(Mapping("node1", "node1", "/robot1/positions", "positions", "std_msgs/msg/String"))
     print(s)
+    class MockLogger:
+        def debug(self, msg):
+            print(msg)
+
+        def info(self, msg):
+            print(msg)
+
+    create_kafka_topic("test1", MockLogger())

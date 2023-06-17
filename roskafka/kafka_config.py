@@ -1,5 +1,4 @@
 import os
-import rclpy
 
 from confluent_kafka.schema_registry import SchemaRegistryClient
 
@@ -11,6 +10,7 @@ sr = SchemaRegistryClient({"url": schema_registry})
 
 
 def wait_for_schema(node, topic):
+    import rclpy
     max_retries = 10
     retries = 0
     while True:
