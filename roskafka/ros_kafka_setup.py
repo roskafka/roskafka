@@ -88,6 +88,7 @@ class RosKafkaSetup(BridgeNode):
 
     def __init__(self):
         super().__init__('ros_kafka_setup')
+        self.get_logger().info("Starting ros_kafka_setup node...")
 
 
 def main(args=None):
