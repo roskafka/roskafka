@@ -10,16 +10,6 @@ def get_msg_type(type):
     return getattr(importlib.import_module(module), symbol)
 
 
-def params_to_mappings(params):
-    mappings = {}
-    for key, value in params.items():
-        namespace, name = key.split('.', maxsplit=1)
-        if namespace not in mappings:
-            mappings[namespace] = {}
-        mappings[namespace][name] = value.get_parameter_value().string_value
-    return mappings
-
-
 def msg_to_dict(msg):
     return rosidl_runtime_py.message_to_ordereddict(msg)
 

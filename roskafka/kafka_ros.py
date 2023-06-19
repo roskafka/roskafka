@@ -2,7 +2,6 @@ import string
 import threading
 
 import rclpy
-import rclpy.parameter
 from confluent_kafka import Consumer
 from confluent_kafka.schema_registry.avro import AvroDeserializer
 from confluent_kafka.serialization import SerializationContext, MessageField
@@ -95,10 +94,6 @@ class KafkaRosBridge(BridgeNode):
         if name not in self._mappings:
             raise KeyError()
         self._mappings[name].close()
-        # Delete existing parameters by setting them to an empty parameter
-        self.set_parameters_atomically([
-            rclpy.parameter.Parameter(f'mappings.{name}.{paramName}') for paramName in self.get_parameters_by_prefix(f'mappings.{name}')
-        ])
         del self._mappings[name]
 
     def __init__(self):

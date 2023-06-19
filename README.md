@@ -52,44 +52,17 @@ Optionally, the log level can be configured using the `log_level` parameter:
 
 ### Mapping Configuration
 
-There are two ways to configure mappings in roskafka: using parameter files or
-using services.
+Mappings are managed via service calls.
 
-#### Using parameter files
-
-Prepare mapping file (`mappings.yaml`):
-
-    /ros_kafka:
-      ros__parameters:
-        mappings:
-          <mapping_name>:
-            source: <ros_topic>
-            destination: <kafka_topic>
-            type: <msg_type>
-        use_sim_time: false
-    /kafka_ros:
-      ros__parameters:
-        mappings:
-          <mapping_name>:
-            source: <kafka_topic>
-            destination: <ros_topic>
-            type: <msg_type>
-        use_sim_time: false
-
-Provide mappings after starting the bridge nodes:
-
-    ros2 param load /ros_kafka mappings.yaml
-    ros2 param load /kafka_ros mappings.yaml
-
-Alternatively, the mappings can be provided when starting the bridge nodes:
-
-    ros2 run roskafka kafka_ros --ros-args --params-file mappings.yaml &
-    ros2 run roskafka ros_kafka --ros-args --params-file mappings.yaml &
-
-#### Using services
+#### Add mappings
 
     ros2 service call /ros_kafka/add_mapping roskafka_interfaces/srv/AddMapping '{name: <mapping_name>, source: <ros_topic>, destination: <kafka_topic>, type: <msg_type>}'
     ros2 service call /kafka_ros/add_mapping roskafka_interfaces/srv/AddMapping '{name: <mapping_name>, source: <kafka_topic>, destination: <ros_topic>, type: <msg_type>}'
+
+#### Remove mappings
+
+    ros2 service call /ros_kafka/remove_mapping roskafka_interfaces/srv/RemoveMapping '{name: <mapping_name>}'
+    ros2 service call /kafka_ros/remove_mapping roskafka_interfaces/srv/RemoveMapping '{name: <mapping_name>}'
 
 #### Templates
 
