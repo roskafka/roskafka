@@ -39,13 +39,19 @@ class ConsumerThread:
                 if msg is None:
                     continue
 
+                key = msg.key()
                 data = self.value_deserializer(msg.value(), SerializationContext(mapping.destination, MessageField.VALUE))
                 if data is not None:
                     mapping.node.get_logger().debug(f'Received message from {mapping.name}: {data}')
-                    msg = dict_to_msg(mapping.type, data)
-                    mapping.node.get_logger().debug(f'Sending message to {mapping.destination}: {msg}')
-                    mapping.publisher.publish(msg)
-                    # TODO: maybe create publisher on demand
+                    destination = string.Template(mapping.destination).substitute({"robot": key})
+                    if destination not in mapping.publishers:
+                        mapping.publishers[destination] = mapping.node.create_publisher(
+                            self.msg_type,
+                            destination,
+                            10)
+                        mapping.node.get_logger().info(f'Created publisher for destination {mapping.destination}')
+                    mapping.node.get_logger().debug(f'Sending message to {destination}: {data}')
+                    mapping.publishers[destination].publish(dict_to_msg(mapping.type, data))
 
         self.thread = threading.Thread(target=poll)
 
