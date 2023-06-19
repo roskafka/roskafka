@@ -97,6 +97,14 @@ The `destination` parameter in the `kafka_ros` mappings can be specified as a
 template, e.g., `/${mapping}/pose_from_kafka`. The values for the variables are
 substituted from the `metadata` part of the message.
 
+### Kafka Broker Configuration
+
+The Kafka broker can be configured using two environment variables:
+- `BOOTSTRAP_SERVERS`: the address of the bootstrap server (defaults to
+  `localhost:9092`)
+- `SCHEMA_REGISTRY`: the address of the schema registry (defaults to
+  `http://localhost:8081`)
+
 
 ## Message Format
 
