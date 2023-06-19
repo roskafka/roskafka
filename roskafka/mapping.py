@@ -31,13 +31,20 @@ def get_recursive_fields(msg_type_name: str, logger):
     for key, msg_type in ros_fields.items():
         if "/" in msg_type:
             msg_string = msg_type.split("/")[0] + "/msg/" + msg_type.split("/")[1]
-            inner_fields = get_recursive_fields(msg_string)
+            inner_fields = get_recursive_fields(msg_string, logger)
             field = avro_record(key, inner_fields)
         else:
-            field = {"name": key, "type": msg_type}
-            # TODO: maybe map ROS types to Avro types, but they already seem to be the same
+            avro_type = map_ros_to_avro(msg_type)
+            field = {"name": key, "type": avro_type}
         fields.append(field)
     return fields
+
+
+def map_ros_to_avro(ros_type):
+    # TODO: maybe map ROS types to Avro types, but they already seem to be the same
+    avro_type = ros_type
+    # TODO: Arrays
+    return avro_type
 
 
 def generate_avro(mapping: Mapping, logger):
