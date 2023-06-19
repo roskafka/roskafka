@@ -1,13 +1,17 @@
+import string
+import threading
+
 import rclpy
 import rclpy.parameter
-import kafka
-import json
-import threading
-import string
-from roskafka.mapping import Mapping
+from confluent_kafka import Consumer
+from confluent_kafka.schema_registry.avro import AvroDeserializer
+from confluent_kafka.serialization import SerializationContext, MessageField
+
 from roskafka.bridge_node import BridgeNode
-from roskafka.utils import get_msg_type
+from roskafka.kafka_config import bootstrap_servers, wait_for_schema, sr
+from roskafka.mapping import Mapping
 from roskafka.utils import dict_to_msg
+from roskafka.utils import get_msg_type
 
 
 class ConsumerThread:
@@ -18,24 +22,35 @@ class ConsumerThread:
             self.msg_type = get_msg_type(mapping.type)
         except Exception:
             raise
-        self.consumer = kafka.KafkaConsumer(mapping.source, bootstrap_servers="localhost:9092")
+        self.consumer = Consumer({
+            'bootstrap.servers': bootstrap_servers,
+            'group.id': 'kafka-ros',
+            'auto.offset.reset': 'earliest'
+        })
+        schema_value = wait_for_schema(mapping.destination)
+        self.value_deserializer = AvroDeserializer(schema_registry_client=sr, schema_str=schema_value)
+        self.consumer.subscribe([mapping.destination])
 
         def poll():
             while self.is_running:
-                polling_result = self.consumer.poll(timeout_ms=1000)
-                for topic_partition, consumer_records in polling_result.items():
-                    for consumer_record in consumer_records:
-                        mapping.node.get_logger().debug(f'Received message from {mapping.name}: {consumer_record.value}')
-                        msg = json.loads(consumer_record.value)
-                        destination = string.Template(mapping.destination).substitute(msg['metadata'])
-                        if destination not in mapping.publishers:
-                            mapping.publishers[destination] = mapping.node.create_publisher(
-                                self.msg_type,
-                                destination,
-                                10)
-                            mapping.node.get_logger().info(f'Created publisher for destination {mapping.destination}')
-                        mapping.node.get_logger().debug(f'Sending message to {mapping.destination}: {msg["payload"]}')
-                        mapping.publishers[destination].publish(dict_to_msg(mapping.type, msg['payload']))
+                msg = self.consumer.poll(1.0)
+                if msg is None:
+                    continue
+
+                key = msg.key()
+                data = self.value_deserializer(msg.value(), SerializationContext(mapping.destination, MessageField.VALUE))
+                if data is not None:
+                    mapping.node.get_logger().debug(f'Received message from {mapping.name}: {data}')
+                    destination = string.Template(mapping.destination).substitute({"robot": key})
+                    if destination not in mapping.publishers:
+                        mapping.publishers[destination] = mapping.node.create_publisher(
+                            self.msg_type,
+                            destination,
+                            10)
+                        mapping.node.get_logger().info(f'Created publisher for destination {mapping.destination}')
+                    mapping.node.get_logger().debug(f'Sending message to {destination}: {data}')
+                    mapping.publishers[destination].publish(dict_to_msg(mapping.type, data))
+
         self.thread = threading.Thread(target=poll)
 
     def start(self):
@@ -63,6 +78,7 @@ class KafkaRosMapping(Mapping):
         self.subscriber = ConsumerThread(self)
         self.subscriber.start()
         self.publishers = {}
+
 
     def __del__(self):
         if not self._closed:
