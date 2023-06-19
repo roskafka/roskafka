@@ -24,6 +24,7 @@ Source package:
 
     . install/setup.bash
 
+
 ## Startup
 
 There are two ways to start roskafka: using launch files or manually.
@@ -46,12 +47,15 @@ Optionally, the log level can be configured using the `log_level` parameter:
     ros2 run roskafka kafka_ros --ros-args --log-level kafka_ros:=debug &
     ros2 run roskafka ros_kafka --ros-args --log-level ros_kafka:=debug &
 
+
 ## Configuration
 
-There are two ways to configure roskafka: using parameter files or using
-services.
+### Mapping Configuration
 
-### Using parameter files
+There are two ways to configure mappings in roskafka: using parameter files or
+using services.
+
+#### Using parameter files
 
 Prepare mapping file (`mappings.yaml`):
 
@@ -82,16 +86,17 @@ Alternatively, the mappings can be provided when starting the bridge nodes:
     ros2 run roskafka kafka_ros --ros-args --params-file mappings.yaml &
     ros2 run roskafka ros_kafka --ros-args --params-file mappings.yaml &
 
-### Using services
+#### Using services
 
     ros2 service call /ros_kafka/add_mapping roskafka_interfaces/srv/AddMapping '{name: <mapping_name>, source: <ros_topic>, destination: <kafka_topic>, type: <msg_type>}'
     ros2 service call /kafka_ros/add_mapping roskafka_interfaces/srv/AddMapping '{name: <mapping_name>, source: <kafka_topic>, destination: <ros_topic>, type: <msg_type>}'
 
-### Templates
+#### Templates
 
 The `destination` parameter in the `kafka_ros` mappings can be specified as a
 template, e.g., `/${mapping}/pose_from_kafka`. The values for the variables are
 substituted from the `metadata` part of the message.
+
 
 ## Message Format
 
@@ -109,6 +114,7 @@ of the message.
 
 The messages that are received by `kafka_ros` expect the same structure. The
 `metadata` object can be used for template substitutions (see above).
+
 
 ## Demo
 
@@ -132,6 +138,7 @@ Pump messages from `turtle1_pose` (Kafka) to `/turtle1/pose_from_kafka` (ROS):
 Verify that messages are arriving in ROS:
 
     ros2 topic echo /turtle1/pose_from_kafka
+
 
 ## Testing
 
