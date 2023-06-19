@@ -1,19 +1,17 @@
+import string
+import threading
+
 import rclpy
 import rclpy.parameter
-import json
-import threading
-import string
-
 from confluent_kafka import Consumer
 from confluent_kafka.schema_registry.avro import AvroDeserializer
-from confluent_kafka.schema_registry import SchemaRegistryClient
-from confluent_kafka.serialization import StringSerializer, SerializationContext, MessageField
+from confluent_kafka.serialization import SerializationContext, MessageField
 
-from roskafka.mapping import Mapping
 from roskafka.bridge_node import BridgeNode
-from roskafka.utils import get_msg_type
-from roskafka.utils import dict_to_msg
 from roskafka.kafka_config import bootstrap_servers, wait_for_schema, sr
+from roskafka.mapping import Mapping
+from roskafka.utils import dict_to_msg
+from roskafka.utils import get_msg_type
 
 
 class ConsumerThread:
