@@ -8,8 +8,12 @@ Download code to ROS 2 workspace:
     cd ~/ros2_ws/src
     git clone https://gitlab.informatik.hs-furtwangen.de/ss23-forschungsprojekt-7/roskafka.git
 
-Install dependencies:
+Install ROS dependencies:
 - [roskafka_interfaces](https://gitlab.informatik.hs-furtwangen.de/ss23-forschungsprojekt-7/roskafka_interfaces)
+
+Install Python dependencies:
+- [confluent-kafka](https://pypi.org/project/confluent-kafka/)
+- [fastavro](https://pypi.org/project/fastavro/)
 
 Build package:
 
