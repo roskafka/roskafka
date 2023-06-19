@@ -9,7 +9,6 @@
   <exec_depend>rclpy</exec_depend>
   <exec_depend>rosidl_runtime_py</exec_depend>
   <exec_depend>confluent-kafka</exec_depend>
-  <exec_depend>requests</exec_depend>
   <exec_depend>fastavro</exec_depend>
   <exec_depend>requests</exec_depend>
   <exec_depend>roskafka_interfaces</exec_depend>
