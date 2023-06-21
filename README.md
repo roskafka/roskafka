@@ -12,8 +12,8 @@ Install ROS dependencies:
 - [roskafka_interfaces](https://gitlab.informatik.hs-furtwangen.de/ss23-forschungsprojekt-7/roskafka_interfaces)
 
 Install Python dependencies:
-- [confluent-kafka](https://pypi.org/project/confluent-kafka/)
-- [fastavro](https://pypi.org/project/fastavro/)
+- [confluent-kafka](https://pypi.org/project/confluent-kafka/) (tested with version 2.1.1)
+- [fastavro](https://pypi.org/project/fastavro/) (tested with version 1.7.4)
 
 Build package:
 
