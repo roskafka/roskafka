@@ -7,6 +7,7 @@ from confluent_kafka import Producer
 from confluent_kafka.schema_registry.avro import AvroSerializer
 from confluent_kafka.schema_registry import SchemaRegistryClient
 from confluent_kafka.serialization import StringSerializer, SerializationContext, MessageField
+from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy
 
 from roskafka.mapping import Mapping
 from roskafka.bridge_node import BridgeNode
@@ -25,46 +26,51 @@ class RosKafkaMapping(Mapping):
     def _msg_handler(self, msg):
         self.node.get_logger().debug(f'Received message from {self.name}: {msg}')
         value = msg_to_dict(msg)
-        key = self.source  # TODO: get robot name from parameter
-        self.node.get_logger().debug(f'Sending message to {self.destination}: {value}')
+        key = self.ros_topic.split("/")[0]
+        self.node.get_logger().debug(f'Sending message to {self.kafka_topic}: {value}')
         self.producer.produce(
-            topic=self.destination,
+            topic=self.kafka_topic,
             key=self.key_serializer(key),
             value=self.value_serializer(
                 value,
                 SerializationContext(
-                    self.destination,
+                    self.kafka_topic,
                     MessageField.VALUE,
                     [
                         ('mapping', self.name.encode('utf-8')),
-                        ('source', self.source.encode('utf-8')),
+                        ('source', self.ros_topic.encode('utf-8')),
                         ('type', self.type.encode('utf-8'))
                     ]
                 )
             )
         )
 
-    def __init__(self, node, name, source, destination, type):
-        super().__init__(node, name, source, destination, type)
+    def __init__(self, node, name, kafka_topic, ros_topic, type):
+        super().__init__(node, name, kafka_topic, ros_topic, type)
         self._closed = False
         try:
             msg_type = get_msg_type(self.type)
         except Exception:
             raise
-        node.get_logger().debug(f'Creating KafkaProducer to {self.destination} for {self.name} ...')
-        schema_value = wait_for_schema(self.node, self.destination)
+        node.get_logger().debug(f'Creating KafkaProducer to {self.kafka_topic} for {self.name} ...')
+        schema_value = wait_for_schema(self.node, self.kafka_topic)
         self.value_serializer = AvroSerializer(schema_registry_client=sr, schema_str=schema_value)
         self.key_serializer = StringSerializer('utf_8')
         self.producer = Producer({
             'bootstrap.servers': bootstrap_servers,
         })
 
-        node.get_logger().debug(f'Creating ROS subscription to {self.source} for {self.name} ...')
+        node.get_logger().debug(f'Creating ROS subscription to {self.ros_topic} for {self.name} ...')
+        qos_profile = QoSProfile(
+            reliability=ReliabilityPolicy.BEST_EFFORT ,
+            history=HistoryPolicy.KEEP_LAST,
+            depth=1
+        )
         self.subscriber = self.node.create_subscription(
             msg_type,
-            self.source,
+            self.ros_topic,
             self._msg_handler,
-            10)
+            qos_profile)
 
     def __del__(self):
         if not self._closed:

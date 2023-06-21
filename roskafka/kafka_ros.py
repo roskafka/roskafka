@@ -15,7 +15,7 @@ from roskafka.utils import get_msg_type
 
 class ConsumerThread:
 
-    def __init__(self, mapping):
+    def __init__(self, mapping: "KafkaRosMapping"):
         self.is_running = False
         try:
             self.msg_type = get_msg_type(mapping.type)
@@ -26,9 +26,9 @@ class ConsumerThread:
             'group.id': 'kafka-ros',
             'auto.offset.reset': 'earliest'
         })
-        schema_value = wait_for_schema(mapping.destination)
+        schema_value = wait_for_schema(mapping.node, mapping.kafka_topic)
         self.value_deserializer = AvroDeserializer(schema_registry_client=sr, schema_str=schema_value)
-        self.consumer.subscribe([mapping.destination])
+        self.consumer.subscribe([mapping.kafka_topic])
 
         def poll():
             while self.is_running:
@@ -37,16 +37,16 @@ class ConsumerThread:
                     continue
 
                 key = msg.key()
-                data = self.value_deserializer(msg.value(), SerializationContext(mapping.destination, MessageField.VALUE))
+                data = self.value_deserializer(msg.value(), SerializationContext(mapping.kafka_topic, MessageField.VALUE))
                 if data is not None:
                     mapping.node.get_logger().debug(f'Received message from {mapping.name}: {data}')
-                    destination = string.Template(mapping.destination).substitute({"robot": key})
+                    destination = string.Template(mapping.ros_topic).substitute({"robot": key})
                     if destination not in mapping.publishers:
                         mapping.publishers[destination] = mapping.node.create_publisher(
                             self.msg_type,
                             destination,
                             10)
-                        mapping.node.get_logger().info(f'Created publisher for destination {mapping.destination}')
+                        mapping.node.get_logger().info(f'Created publisher from {mapping.kafka_topic} to {mapping.ros_topic}')
                     mapping.node.get_logger().debug(f'Sending message to {destination}: {data}')
                     mapping.publishers[destination].publish(dict_to_msg(mapping.type, data))
 
@@ -70,8 +70,8 @@ class KafkaRosMapping(Mapping):
             self.node.destroy_publisher(publisher)
         self._closed = True
 
-    def __init__(self, node, name, source, destination, type):
-        super().__init__(node, name, source, destination, type)
+    def __init__(self, node, name, kafka_topic, ros_topic, type):
+        super().__init__(node, name, kafka_topic, ros_topic, type)
         self._closed = False
         self.node.get_logger().debug(f'Starting consumer thread for mapping {name} ...')
         self.subscriber = ConsumerThread(self)
@@ -86,8 +86,8 @@ class KafkaRosMapping(Mapping):
 
 class KafkaRosBridge(BridgeNode):
 
-    def add_mapping(self, name, source, destination, type):
-        mapping = KafkaRosMapping(self, name, source, destination, type)
+    def add_mapping(self, name, kafka_topic, ros_topic, type):
+        mapping = KafkaRosMapping(self, name, kafka_topic, ros_topic, type)
         self._mappings[name] = mapping
 
     def remove_mapping(self, name):

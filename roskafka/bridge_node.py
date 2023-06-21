@@ -7,8 +7,9 @@ class BridgeNode(rclpy.node.Node):
 
     def _add_mapping_service_handler(self, request, response):
         try:
-            self.add_mapping(request.name, request.source, request.destination, request.type)
+            self.add_mapping(request.name, request.kafka_topic, request.ros_topic, request.type)
         except Exception as e:
+            self.get_logger().error(e)
             response.success = False
             response.message = f'Could not add mapping: {e}'
         else:
@@ -22,6 +23,9 @@ class BridgeNode(rclpy.node.Node):
         except KeyError:
             response.success = False
             response.message = 'Mapping not found'
+        except Exception as e:
+            response.success = False
+            response.message = f'Could not remove mapping: {e}'
         else:
             response.success = True
             response.message = 'Mapping removed'
