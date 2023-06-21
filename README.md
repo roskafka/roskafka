@@ -56,8 +56,8 @@ Mappings are managed via service calls.
 
 #### Add mappings
 
-    ros2 service call /ros_kafka/add_mapping roskafka_interfaces/srv/AddMapping '{name: <mapping_name>, source: <ros_topic>, destination: <kafka_topic>, type: <msg_type>}'
-    ros2 service call /kafka_ros/add_mapping roskafka_interfaces/srv/AddMapping '{name: <mapping_name>, source: <kafka_topic>, destination: <ros_topic>, type: <msg_type>}'
+    ros2 service call /ros_kafka/add_mapping roskafka_interfaces/srv/AddMapping '{name: <mapping_name>, ros_topic: <ros_topic>, kafka_topic: <kafka_topic>, type: <msg_type>}'
+    ros2 service call /kafka_ros/add_mapping roskafka_interfaces/srv/AddMapping '{name: <mapping_name>, kafka_topic: <kafka_topic>, ros_topic: <ros_topic>, type: <msg_type>}'
 
 #### Remove mappings
 
@@ -89,9 +89,10 @@ The messages sent to Kafka via `ros_kafka` have the following structure:
     }
 
 `<msg>` is the serialized ROS 2 message, `<metadata>` an object containing the
-name of the mapping (`mapping`), the mapping source (`source`), and the mapping
-destination (`destination`). This information is also put into the Kafka header
-of the message.
+name of the mapping (`mapping`), the mapping source (either `ros_topic` or
+`kafka_topic`), and the mapping destination (either `ros_topic` or
+`kafka_topic`). This information is also put into the Kafka header of the
+message.
 
 The messages that are received by `kafka_ros` expect the same structure. The
 `metadata` object can be used for template substitutions (see above).
@@ -106,7 +107,7 @@ Run turtlesim and let turtle move in a circle:
 
 Pump messages from `/turtle1/pose` (ROS) to `turtle1_pose` (Kafka):
 
-    ros2 service call /ros_kafka/add_mapping roskafka_interfaces/srv/AddMapping '{name: turtle1, source: /turtle1/pose, destination: turtle1_pose, type: turtlesim/msg/Pose}'
+    ros2 service call /ros_kafka/add_mapping roskafka_interfaces/srv/AddMapping '{name: turtle1, ros_topic: /turtle1/pose, kafka_topic: turtle1_pose, type: turtlesim/msg/Pose}'
 
 Verify that messages are arriving in Kafka:
 
@@ -114,7 +115,7 @@ Verify that messages are arriving in Kafka:
 
 Pump messages from `turtle1_pose` (Kafka) to `/turtle1/pose_from_kafka` (ROS):
 
-    ros2 service call /kafka_ros/add_mapping roskafka_interfaces/srv/AddMapping '{name: turtle1, source: turtle1_pose, destination: /turtle1/pose_from_kafka, type: turtlesim/msg/Pose}'
+    ros2 service call /kafka_ros/add_mapping roskafka_interfaces/srv/AddMapping '{name: turtle1, kafka_topic: turtle1_pose, ros_topic: /turtle1/pose_from_kafka, type: turtlesim/msg/Pose}'
 
 Verify that messages are arriving in ROS:
 
