@@ -70,8 +70,8 @@ class KafkaRosMapping(Mapping):
             self.node.destroy_publisher(publisher)
         self._closed = True
 
-    def __init__(self, node, name, kafka_topic, ros_topic, type):
-        super().__init__(node, name, kafka_topic, ros_topic, type)
+    def __init__(self, node, name, ros_topic, kafka_topic, type):
+        super().__init__(node, name, ros_topic, kafka_topic, type)
         self._closed = False
         self.node.get_logger().debug(f'Starting consumer thread for mapping {name} ...')
         self.subscriber = ConsumerThread(self)
@@ -86,8 +86,8 @@ class KafkaRosMapping(Mapping):
 
 class KafkaRosBridge(BridgeNode):
 
-    def add_mapping(self, name, kafka_topic, ros_topic, type):
-        mapping = KafkaRosMapping(self, name, kafka_topic, ros_topic, type)
+    def add_mapping(self, name, ros_topic, kafka_topic, type):
+        mapping = KafkaRosMapping(self, name, ros_topic, kafka_topic, type)
         self._mappings[name] = mapping
 
     def remove_mapping(self, name):

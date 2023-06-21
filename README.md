@@ -57,7 +57,7 @@ Mappings are managed via service calls.
 #### Add mappings
 
     ros2 service call /ros_kafka/add_mapping roskafka_interfaces/srv/AddMapping '{name: <mapping_name>, ros_topic: <ros_topic>, kafka_topic: <kafka_topic>, type: <msg_type>}'
-    ros2 service call /kafka_ros/add_mapping roskafka_interfaces/srv/AddMapping '{name: <mapping_name>, kafka_topic: <kafka_topic>, ros_topic: <ros_topic>, type: <msg_type>}'
+    ros2 service call /kafka_ros/add_mapping roskafka_interfaces/srv/AddMapping '{name: <mapping_name>, ros_topic: <ros_topic>, kafka_topic: <kafka_topic>, type: <msg_type>}'
 
 #### Remove mappings
 
@@ -116,7 +116,7 @@ Verify that messages are arriving in Kafka:
 
 Pump messages from `turtle1_pose` (Kafka) to `/turtle1/pose_from_kafka` (ROS):
 
-    ros2 service call /kafka_ros/add_mapping roskafka_interfaces/srv/AddMapping '{name: turtle1, kafka_topic: turtle1_pose, ros_topic: /turtle1/pose_from_kafka, type: turtlesim/msg/Pose}'
+    ros2 service call /kafka_ros/add_mapping roskafka_interfaces/srv/AddMapping '{name: turtle1, ros_topic: /turtle1/pose_from_kafka, kafka_topic: turtle1_pose, type: turtlesim/msg/Pose}'
 
 Verify that messages are arriving in ROS:
 

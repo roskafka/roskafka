@@ -38,15 +38,15 @@ class RosKafkaMapping(Mapping):
                     MessageField.VALUE,
                     [
                         ('mapping', self.name.encode('utf-8')),
-                        ('source', self.ros_topic.encode('utf-8')),
+                        ('ros_topic', self.ros_topic.encode('utf-8')),
                         ('type', self.type.encode('utf-8'))
                     ]
                 )
             )
         )
 
-    def __init__(self, node, name, kafka_topic, ros_topic, type):
-        super().__init__(node, name, kafka_topic, ros_topic, type)
+    def __init__(self, node, name, ros_topic, kafka_topic, type):
+        super().__init__(node, name, ros_topic, kafka_topic, type)
         self._closed = False
         try:
             msg_type = get_msg_type(self.type)
@@ -79,8 +79,8 @@ class RosKafkaMapping(Mapping):
 
 class RosKafkaBridge(BridgeNode):
 
-    def add_mapping(self, name, source, destination, type):
-        mapping = RosKafkaMapping(self, name, source, destination, type)
+    def add_mapping(self, name, ros_topic, kafka_topic, type):
+        mapping = RosKafkaMapping(self, name, ros_topic, kafka_topic, type)
         self._mappings[name] = mapping
 
     def remove_mapping(self, name):

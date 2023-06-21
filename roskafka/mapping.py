@@ -18,11 +18,11 @@ avro_schema_namespace = "de.hfu"
 
 class Mapping:
 
-    def __init__(self, node, name, kafka_topic, ros_topic, type):
+    def __init__(self, node, name, ros_topic, kafka_topic, type):
         self.node = node
         self.name = name
-        self.kafka_topic = kafka_topic
         self.ros_topic = ros_topic
+        self.kafka_topic = kafka_topic
         self.type = type
         add_mapping(self)
 

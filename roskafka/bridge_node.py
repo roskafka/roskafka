@@ -7,7 +7,7 @@ class BridgeNode(rclpy.node.Node):
 
     def _add_mapping_service_handler(self, request, response):
         try:
-            self.add_mapping(request.name, request.kafka_topic, request.ros_topic, request.type)
+            self.add_mapping(request.name, request.ros_topic, request.kafka_topic, request.type)
         except Exception as e:
             self.get_logger().error(e)
             response.success = False
