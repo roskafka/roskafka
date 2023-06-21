@@ -89,13 +89,14 @@ The messages sent to Kafka via `ros_kafka` have the following structure:
     }
 
 `<msg>` is the serialized ROS 2 message, `<metadata>` an object containing the
-name of the mapping (`mapping`), the mapping source (either `ros_topic` or
-`kafka_topic`), and the mapping destination (either `ros_topic` or
-`kafka_topic`). This information is also put into the Kafka header of the
-message.
+name of the mapping (`mapping`), the mapping source (`ros_topic`), and the
+mapping destination (`kafka_topic`). This information is also put into the
+Kafka header of the message.
 
-The messages that are received by `kafka_ros` expect the same structure. The
-`metadata` object can be used for template substitutions (see above).
+The messages that are received by `kafka_ros` expect a similar structure,
+except that the mapping source is given as `kafka_topic` and the mapping
+destination as `ros_topic`.  Additionally, the `metadata` object can be used
+for template substitutions (see above).
 
 
 ## Demo
