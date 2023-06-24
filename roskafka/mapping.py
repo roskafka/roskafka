@@ -6,7 +6,7 @@ import confluent_kafka
 import confluent_kafka.admin
 from confluent_kafka import KafkaError, KafkaException
 
-from roskafka.kafka_config import bootstrap_servers, schema_registry
+from roskafka.kafka_config import get_bootstrap_servers, get_schema_registry_url
 from roskafka.utils import get_msg_type
 
 # sequence msg type: sequence<irobot_create_msgs/msg/HazardDetection>
@@ -110,7 +110,7 @@ def avro_record(name: str, fields: list):
     }
 
 
-def create_kafka_topic(name: str, logger):
+def create_kafka_topic(name: str, bootstrap_servers: str, logger):
     admin_client = confluent_kafka.admin.AdminClient({"bootstrap.servers": bootstrap_servers})
     new_topic = confluent_kafka.admin.NewTopic(name, num_partitions=1, replication_factor=1)
     future_topics = admin_client.create_topics([new_topic])
@@ -136,7 +136,8 @@ def create_avro_schema(mapping: Mapping, logger):
         "schema": json.dumps(schema)  # schema needs to be a string and not a dict
     }
     schema_name = f"{mapping.kafka_topic}-value"
-    res = requests.post(f"{schema_registry}/subjects/{schema_name}/versions",
+    schema_registry_url = get_schema_registry_url(mapping.node)
+    res = requests.post(f"{schema_registry_url}/subjects/{schema_name}/versions",
                         data=json.dumps(request_content),
                         headers={"Content-Type": "application/vnd.schemaregistry.v1+json"})
     if not res.ok:
@@ -148,7 +149,8 @@ def create_avro_schema(mapping: Mapping, logger):
 
 def add_mapping(mapping: Mapping):
     mapping.node.get_logger().info(f"Adding mapping: {mapping}")
-    create_kafka_topic(mapping.kafka_topic, mapping.node.get_logger())
+    bootstrap_servers = get_bootstrap_servers(mapping.node)
+    create_kafka_topic(mapping.kafka_topic, bootstrap_servers, mapping.node.get_logger())
     create_avro_schema(mapping, mapping.node.get_logger())
 
 

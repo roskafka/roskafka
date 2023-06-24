@@ -7,7 +7,7 @@ from confluent_kafka.schema_registry.avro import AvroDeserializer
 from confluent_kafka.serialization import SerializationContext, MessageField
 
 from roskafka.bridge_node import BridgeNode
-from roskafka.kafka_config import bootstrap_servers, wait_for_schema, sr
+from roskafka.kafka_config import get_bootstrap_servers, wait_for_schema, get_schema_registry
 from roskafka.mapping import Mapping
 from roskafka.utils import dict_to_msg
 from roskafka.utils import get_msg_type
@@ -22,12 +22,12 @@ class ConsumerThread:
         except Exception:
             raise
         self.consumer = Consumer({
-            'bootstrap.servers': bootstrap_servers,
+            'bootstrap.servers': get_bootstrap_servers(mapping.node),
             'group.id': 'kafka-ros',
             'auto.offset.reset': 'earliest'
         })
         schema_value = wait_for_schema(mapping.node, mapping.kafka_topic)
-        self.value_deserializer = AvroDeserializer(schema_registry_client=sr, schema_str=schema_value)
+        self.value_deserializer = AvroDeserializer(schema_registry_client=get_schema_registry(mapping.node), schema_str=schema_value)
         self.consumer.subscribe([mapping.kafka_topic])
 
         def poll():

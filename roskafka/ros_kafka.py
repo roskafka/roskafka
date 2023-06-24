@@ -2,6 +2,7 @@ import os
 
 import rclpy
 import json
+import time
 
 from confluent_kafka import Producer
 from confluent_kafka.schema_registry.avro import AvroSerializer
@@ -13,7 +14,7 @@ from roskafka.mapping import Mapping
 from roskafka.bridge_node import BridgeNode
 from roskafka.utils import get_msg_type
 from roskafka.utils import msg_to_dict
-from roskafka.kafka_config import bootstrap_servers, wait_for_schema, sr
+from roskafka.kafka_config import get_bootstrap_servers, wait_for_schema, get_schema_registry
 
 
 class RosKafkaMapping(Mapping):
@@ -25,25 +26,27 @@ class RosKafkaMapping(Mapping):
 
     def _msg_handler(self, msg):
         self.node.get_logger().debug(f'Received message from {self.name}: {msg}')
-        value = msg_to_dict(msg)
-        key = self.ros_topic.split("/")[0]
-        self.node.get_logger().debug(f'Sending message to {self.kafka_topic}: {value}')
-        self.producer.produce(
-            topic=self.kafka_topic,
-            key=self.key_serializer(key),
-            value=self.value_serializer(
-                value,
-                SerializationContext(
-                    self.kafka_topic,
-                    MessageField.VALUE,
-                    [
-                        ('mapping', self.name.encode('utf-8')),
-                        ('ros_topic', self.ros_topic.encode('utf-8')),
-                        ('type', self.type.encode('utf-8'))
-                    ]
+        if time.time() - self.send_interval_seconds > self.last_send:
+            value = msg_to_dict(msg)
+            key = self.ros_topic.split("/")[0]
+            self.node.get_logger().debug(f'Sending message to {self.kafka_topic}: {value}')
+            self.producer.produce(
+                topic=self.kafka_topic,
+                key=self.key_serializer(key),
+                value=self.value_serializer(
+                    value,
+                    SerializationContext(
+                        self.kafka_topic,
+                        MessageField.VALUE,
+                        [
+                            ('mapping', self.name.encode('utf-8')),
+                            ('ros_topic', self.ros_topic.encode('utf-8')),
+                            ('type', self.type.encode('utf-8'))
+                        ]
+                    )
                 )
             )
-        )
+            self.last_send = time.time()
 
     def __init__(self, node, name, ros_topic, kafka_topic, type):
         super().__init__(node, name, ros_topic, kafka_topic, type)
@@ -52,12 +55,14 @@ class RosKafkaMapping(Mapping):
             msg_type = get_msg_type(self.type)
         except Exception:
             raise
+        self.last_send = 0
+        self.send_interval_seconds = 0.1
         node.get_logger().debug(f'Creating KafkaProducer to {self.kafka_topic} for {self.name} ...')
         schema_value = wait_for_schema(self.node, self.kafka_topic)
-        self.value_serializer = AvroSerializer(schema_registry_client=sr, schema_str=schema_value)
+        self.value_serializer = AvroSerializer(schema_registry_client=get_schema_registry(node), schema_str=schema_value)
         self.key_serializer = StringSerializer('utf_8')
         self.producer = Producer({
-            'bootstrap.servers': bootstrap_servers,
+            'bootstrap.servers': get_bootstrap_servers(node),
         })
 
         node.get_logger().debug(f'Creating ROS subscription to {self.ros_topic} for {self.name} ...')
@@ -71,6 +76,8 @@ class RosKafkaMapping(Mapping):
             self.ros_topic,
             self._msg_handler,
             qos_profile)
+
+
 
     def __del__(self):
         if not self._closed:

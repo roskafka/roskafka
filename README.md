@@ -127,3 +127,17 @@ Verify that messages are arriving in ROS:
 
     colcon test --packages-select roskafka
     colcon test-result --all --verbose
+
+
+## Flow
+
+- Add mapping: ros-topic, kafka-topic (type inferred from ros-topic)
+  - get ros type from topic
+  - create kafka topic
+  - (Generic: any robot name can be used)
+- start mapping: ros_kafka/kafka_ros ros-topic, kafka-topic
+  - get avro type from registry
+  - subscribe to topic
+  - publish to topic
+
+- New Node Mapping Config
