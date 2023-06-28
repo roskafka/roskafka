@@ -1,5 +1,7 @@
 # roskafka
 
+roskafka is a ROS (Robot Operating System) 2 package that enables communication between ROS 2 and Apache Kafka.
+
 ## Setup
 
 Download code to ROS 2 workspace:
