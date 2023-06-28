@@ -4,24 +4,24 @@ roskafka is a ROS (Robot Operating System) 2 package that enables communication 
 
 ## Setup
 
-1. Source ROS 2:
+1. Install Python dependencies (for example with pip):
+
+    - [confluent-kafka](https://pypi.org/project/confluent-kafka/) (tested with version 2.1.1)
+    - [fastavro](https://pypi.org/project/fastavro/) (tested with version 1.7.4)
+
+2. Source ROS 2:
 
         source /opt/ros/humble/setup.bash
 
-2. Download code to ROS 2 workspace:
+3. Download code to ROS 2 workspace:
 
         mkdir -p ~/ros2_ws/src
         cd ~/ros2_ws/src
         git clone https://gitlab.informatik.hs-furtwangen.de/ss23-forschungsprojekt-7/roskafka.git
 
-3. Install ROS dependencies:
+4. Install ROS 2 dependencies:
 
     - [roskafka_interfaces](https://gitlab.informatik.hs-furtwangen.de/ss23-forschungsprojekt-7/roskafka_interfaces)
-
-4. Install Python dependencies:
-
-    - [confluent-kafka](https://pypi.org/project/confluent-kafka/) (tested with version 2.1.1)
-    - [fastavro](https://pypi.org/project/fastavro/) (tested with version 1.7.4)
 
 5. Build package:
 
