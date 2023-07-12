@@ -82,9 +82,12 @@ Mappings are managed via service calls.
 
 #### Templates
 
-The `destination` parameter in the `kafka_ros` mappings can be specified as a
-template, e.g., `/${mapping}/pose_from_kafka`. The values for the variables are
-substituted from the `metadata` part of the message.
+The `destination` field in the `kafka_ros` mappings can be parameterized using
+template strings. Currently, only one substitution is supported: `${key}`,
+which refers to the key of the Kafka message.
+
+This mechanism can be used to enable 1:N mappings from Kafka to ROS, e.g., to
+route messages from a single Kafka topic to the matching namespaced robot.
 
 ### Kafka Broker Configuration
 
