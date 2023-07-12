@@ -2,10 +2,11 @@ launch:
 
 - set_env:
     name: schema_registry
-    value: "http://192.168.1.121:8081"
+    value: "http://localhost:8081"
+
 - set_env:
     name: bootstrap_servers
-    value: "192.168.1.121:9092"
+    value: "localhost:9092"
 
 - arg:
     name: "log_level"
