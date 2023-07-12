@@ -114,7 +114,7 @@ Kafka header of the message.
 
 The messages that are received by `kafka_ros` expect a similar structure,
 except that the mapping source is given as `kafka_topic` and the mapping
-destination as `ros_topic`. Additionally, template substinations can be used in
+destination as `ros_topic`. Additionally, template substitutions can be used in
 the `ros_topic` field (see above).
 
 
