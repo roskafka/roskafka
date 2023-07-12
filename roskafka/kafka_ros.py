@@ -22,12 +22,12 @@ class ConsumerThread:
         except Exception:
             raise
         self.consumer = Consumer({
-            'bootstrap.servers': get_bootstrap_servers(mapping.node),
+            'bootstrap.servers': get_bootstrap_servers(),
             'group.id': 'kafka-ros',
             'auto.offset.reset': 'earliest'
         })
         schema_value = wait_for_schema(mapping.node, mapping.kafka_topic)
-        self.value_deserializer = AvroDeserializer(schema_registry_client=get_schema_registry(mapping.node), schema_str=schema_value)
+        self.value_deserializer = AvroDeserializer(schema_registry_client=get_schema_registry(), schema_str=schema_value)
         self.consumer.subscribe([mapping.kafka_topic])
 
         def poll():

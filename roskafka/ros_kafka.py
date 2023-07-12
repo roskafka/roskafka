@@ -59,10 +59,10 @@ class RosKafkaMapping(Mapping):
         self.send_interval_seconds = 0.1
         node.get_logger().debug(f'Creating KafkaProducer to {self.kafka_topic} for {self.name} ...')
         schema_value = wait_for_schema(self.node, self.kafka_topic)
-        self.value_serializer = AvroSerializer(schema_registry_client=get_schema_registry(node), schema_str=schema_value)
+        self.value_serializer = AvroSerializer(schema_registry_client=get_schema_registry(), schema_str=schema_value)
         self.key_serializer = StringSerializer('utf_8')
         self.producer = Producer({
-            'bootstrap.servers': get_bootstrap_servers(node),
+            'bootstrap.servers': get_bootstrap_servers(),
         })
 
         node.get_logger().debug(f'Creating ROS subscription to {self.ros_topic} for {self.name} ...')
