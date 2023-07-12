@@ -82,7 +82,7 @@ Mappings are managed via service calls.
 
 #### Templates
 
-The `destination` field in the `kafka_ros` mappings can be parameterized using
+The `ros_topic` field in the `kafka_ros` mappings can be parameterized using
 template strings. Currently, only one substitution is supported: `${key}`,
 which refers to the key of the Kafka message.
 
@@ -114,8 +114,8 @@ Kafka header of the message.
 
 The messages that are received by `kafka_ros` expect a similar structure,
 except that the mapping source is given as `kafka_topic` and the mapping
-destination as `ros_topic`.  Additionally, the `metadata` object can be used
-for template substitutions (see above).
+destination as `ros_topic`. Additionally, template substinations can be used in
+the `ros_topic` field (see above).
 
 
 ## Demo
