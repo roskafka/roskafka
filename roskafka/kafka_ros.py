@@ -40,7 +40,7 @@ class ConsumerThread:
                 data = self.value_deserializer(msg.value(), SerializationContext(mapping.kafka_topic, MessageField.VALUE))
                 if data is not None:
                     mapping.node.get_logger().debug(f'Received message from {mapping.name}: {data}')
-                    destination = string.Template(mapping.ros_topic).substitute({"robot": key})
+                    destination = string.Template(mapping.ros_topic).substitute({"key": key})
                     if destination not in mapping.publishers:
                         mapping.publishers[destination] = mapping.node.create_publisher(
                             self.msg_type,
@@ -110,3 +110,6 @@ def main(args=None):
 
 if __name__ == '__main__':
     main()
+
+
+# In the picture below all necessary components

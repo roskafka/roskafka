@@ -28,7 +28,7 @@ class RosKafkaMapping(Mapping):
         self.node.get_logger().debug(f'Received message from {self.name}: {msg}')
         if time.time() - self.send_interval_seconds > self.last_send:
             value = msg_to_dict(msg)
-            key = self.ros_topic.split("/")[0]
+            key = self.ros_topic.split("/")[1]  # /<node>/<topic> e.g. /klaus/pose
             self.node.get_logger().debug(f'Sending message to {self.kafka_topic}: {value}')
             self.producer.produce(
                 topic=self.kafka_topic,
