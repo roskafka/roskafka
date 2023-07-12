@@ -1,11 +1,11 @@
 launch:
 
 - set_env:
-    name: schema_registry
+    name: SCHEMA_REGISTRY
     value: "http://localhost:8081"
 
 - set_env:
-    name: bootstrap_servers
+    name: BOOTSTRAP_SERVERS
     value: "localhost:9092"
 
 - arg:

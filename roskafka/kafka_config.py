@@ -7,7 +7,7 @@ schema_registries = {}
 
 
 def get_schema_registry_url(node):
-    return os.environ["schema_registry"]
+    return os.environ["SCHEMA_REGISTRY"]
     return node.declare_parameter('schema_registry').get_parameter_value().string_value
 
 
@@ -19,7 +19,7 @@ def get_schema_registry(node):
 
 
 def get_bootstrap_servers(node):
-    return os.environ["bootstrap_servers"]
+    return os.environ["BOOTSTRAP_SERVERS"]
     return node.declare_parameter('bootstrap_servers').get_parameter_value().string_value
 
 
