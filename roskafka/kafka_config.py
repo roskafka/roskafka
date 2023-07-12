@@ -6,21 +6,19 @@ from confluent_kafka.schema_registry import SchemaRegistryClient
 schema_registries = {}
 
 
-def get_schema_registry_url(node):
-    return os.environ["schema_registry"]
-    return node.declare_parameter('schema_registry').get_parameter_value().string_value
+def get_schema_registry_url():
+    return os.environ["SCHEMA_REGISTRY"]
 
 
-def get_schema_registry(node):
-    schema_registry_url = get_schema_registry_url(node)
+def get_schema_registry():
+    schema_registry_url = get_schema_registry_url()
     if schema_registry_url not in schema_registries:
         schema_registries[schema_registry_url] = SchemaRegistryClient({"url": schema_registry_url})
     return schema_registries[schema_registry_url]
 
 
-def get_bootstrap_servers(node):
-    return os.environ["bootstrap_servers"]
-    return node.declare_parameter('bootstrap_servers').get_parameter_value().string_value
+def get_bootstrap_servers():
+    return os.environ["BOOTSTRAP_SERVERS"]
 
 
 def wait_for_schema(node, topic):
@@ -29,7 +27,7 @@ def wait_for_schema(node, topic):
     retries = 0
     while True:
         try:
-            schema = get_schema_registry(node).get_latest_version(topic + "-value").schema
+            schema = get_schema_registry().get_latest_version(topic + "-value").schema
             return schema
         except Exception:
             retries += 1

@@ -136,7 +136,7 @@ def create_avro_schema(mapping: Mapping, logger):
         "schema": json.dumps(schema)  # schema needs to be a string and not a dict
     }
     schema_name = f"{mapping.kafka_topic}-value"
-    schema_registry_url = get_schema_registry_url(mapping.node)
+    schema_registry_url = get_schema_registry_url()
     res = requests.post(f"{schema_registry_url}/subjects/{schema_name}/versions",
                         data=json.dumps(request_content),
                         headers={"Content-Type": "application/vnd.schemaregistry.v1+json"})
@@ -149,7 +149,7 @@ def create_avro_schema(mapping: Mapping, logger):
 
 def add_mapping(mapping: Mapping):
     mapping.node.get_logger().info(f"Adding mapping: {mapping}")
-    bootstrap_servers = get_bootstrap_servers(mapping.node)
+    bootstrap_servers = get_bootstrap_servers()
     create_kafka_topic(mapping.kafka_topic, bootstrap_servers, mapping.node.get_logger())
     create_avro_schema(mapping, mapping.node.get_logger())
 

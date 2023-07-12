@@ -1,51 +1,67 @@
 # roskafka
 
+roskafka is a ROS (Robot Operating System) 2 package that enables communication between ROS 2 and Apache Kafka.
+
 ## Setup
 
-Download code to ROS 2 workspace:
+1. Install Python dependencies (for example with pip):
 
-    mkdir -p ~/ros2_ws/src
-    cd ~/ros2_ws/src
-    git clone https://gitlab.informatik.hs-furtwangen.de/ss23-forschungsprojekt-7/roskafka.git
+    - [confluent-kafka](https://pypi.org/project/confluent-kafka/) (tested with version 2.1.1)
+    - [fastavro](https://pypi.org/project/fastavro/) (tested with version 1.7.4)
 
-Install ROS dependencies:
-- [roskafka_interfaces](https://gitlab.informatik.hs-furtwangen.de/ss23-forschungsprojekt-7/roskafka_interfaces)
+2. Source ROS 2:
 
-Install Python dependencies:
-- [confluent-kafka](https://pypi.org/project/confluent-kafka/) (tested with version 2.1.1)
-- [fastavro](https://pypi.org/project/fastavro/) (tested with version 1.7.4)
+        source /opt/ros/humble/setup.bash
 
-Build package:
+3. Download code to ROS 2 workspace:
 
-    cd ~/ros2_ws
-    PYTHONWARNINGS=ignore:::setuptools.command.install colcon build --packages-select roskafka
+        mkdir -p ~/ros2_ws/src
+        cd ~/ros2_ws/src
+        git clone https://gitlab.informatik.hs-furtwangen.de/ss23-forschungsprojekt-7/roskafka.git
 
-Source package:
+4. Install ROS 2 dependencies:
 
-    . install/setup.bash
+    - [roskafka_interfaces](https://gitlab.informatik.hs-furtwangen.de/ss23-forschungsprojekt-7/roskafka_interfaces)
+
+5. Build package:
+
+        cd ~/ros2_ws
+        PYTHONWARNINGS=ignore:::setuptools.command.install colcon build --packages-select roskafka
 
 
-## Startup
+## Usage
 
-There are two ways to start roskafka: using launch files or manually.
+1. Open a new terminal: Always source a workspace from a different terminal than the one you used `colcon build`.
 
-### Using launch file
+2. Source ROS 2:
 
-    ros2 launch roskafka roskafka.launch.yaml
+        source /opt/ros/humble/setup.bash
 
-Optionally, the log level can be configured using the `log_level` parameter:
+3. Source workspace:
 
-    ros2 launch roskafka roskafka.launch.yaml log_level:=debug
+        source install/setup.bash
 
-### Manually
+4. Start roskafka:
 
-    ros2 run roskafka kafka_ros &
-    ros2 run roskafka ros_kafka &
+    There are two ways to start roskafka: using launch files or manually.
 
-Optionally, the log level can be configured using the `log_level` parameter:
+    - Using launch file
 
-    ros2 run roskafka kafka_ros --ros-args --log-level kafka_ros:=debug &
-    ros2 run roskafka ros_kafka --ros-args --log-level ros_kafka:=debug &
+            ros2 launch roskafka roskafka.launch.yaml
+
+        Optionally, the log level can be configured using the `log_level` parameter:
+
+            ros2 launch roskafka roskafka.launch.yaml log_level:=debug
+
+    - Manually
+
+            ros2 run roskafka kafka_ros &
+            ros2 run roskafka ros_kafka &
+
+        Optionally, the log level can be configured using the `log_level` parameter:
+
+            ros2 run roskafka kafka_ros --ros-args --log-level kafka_ros:=debug &
+            ros2 run roskafka ros_kafka --ros-args --log-level ros_kafka:=debug &
 
 
 ## Configuration
