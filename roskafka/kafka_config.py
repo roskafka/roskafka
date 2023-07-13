@@ -7,7 +7,7 @@ schema_registries = {}
 
 
 def get_schema_registry_url():
-    return os.environ["SCHEMA_REGISTRY"]
+    return os.getenv("SCHEMA_REGISTRY", "http://localhost:8081")
 
 
 def get_schema_registry():
@@ -18,7 +18,7 @@ def get_schema_registry():
 
 
 def get_bootstrap_servers():
-    return os.environ["BOOTSTRAP_SERVERS"]
+    return os.getenv("BOOTSTRAP_SERVERS", "localhost:9092")
 
 
 def wait_for_schema(node, topic):
